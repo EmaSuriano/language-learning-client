@@ -1,37 +1,38 @@
 "use client";
-
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
 import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import {
+  ThreadList,
   Thread,
   Composer,
+  AssistantMessage,
   useThreadConfig,
   ComposerPrimitive,
   useComposer,
   useMessageRuntime,
+  AssistantActionBar,
   useComposerRuntime,
+  BranchPicker,
+  useContentPartText,
+  useMessage,
+  useRuntimeState,
+  useThreadRuntime,
 } from "@assistant-ui/react";
 import { WebSpeechSynthesisAdapter } from "@assistant-ui/react";
-import { AssistantActionBar } from "@assistant-ui/react";
-import {
-  BellIcon,
-  CodeIcon,
-  SpeakerLoudIcon,
-  SunIcon,
-} from "@radix-ui/react-icons";
+
 import { Progress } from "radix-ui";
+import { useActionBarSpeak } from "@assistant-ui/react/src/primitive-hooks/actionBar/useActionBarSpeak";
 
 import { createThread, getThreadState, sendMessage } from "@/lib/chatApi";
 import AudioRecorder from "./AudioRecorder";
 import { useTranscriber } from "@/hooks/useTranscriber";
 import Constants from "@/lib/Constants";
-
-const MarkdownText = makeMarkdownText();
+import { ApiSpeechSynthesisAdapter } from "./ApiSpeechSynthesisAdapter";
+import AudioRecord from "./AudioRecorder";
 
 export function MyAssistant() {
   const threadIdRef = useRef<string | undefined>(undefined);
-  const speech = new WebSpeechSynthesisAdapter();
 
   const runtime = useLangGraphRuntime({
     threadId: threadIdRef.current,
@@ -56,7 +57,7 @@ export function MyAssistant() {
       threadIdRef.current = threadId;
       return { messages: state.values.messages };
     },
-    adapters: { speech },
+    adapters: { speech: new ApiSpeechSynthesisAdapter() },
   });
 
   return (
@@ -64,7 +65,9 @@ export function MyAssistant() {
       <Thread
         runtime={runtime}
         strings={{
-          welcome: { message: "Ready to start learning?" },
+          welcome: {
+            message: "Ready to start learning?",
+          },
         }}
         branchPicker={{
           allowBranchPicker: true,
@@ -74,65 +77,64 @@ export function MyAssistant() {
           allowCopy: true,
           allowSpeak: true,
           components: {
-            Text: MarkdownText,
+            Text: makeMarkdownText(),
           },
         }}
         components={{
           Composer: MyComposer,
+          AssistantMessage: MyAssistantMessage,
         }}
       />
     </>
   );
 }
 
+const MyAssistantMessage = () => {
+  return (
+    <AssistantMessage.Root>
+      <AssistantMessage.Avatar />
+      <AssistantMessage.Content />
+      <BranchPicker />
+      <AssistantActionBar.Root>
+        <AutomaticSpeak />
+        <AssistantActionBar.Copy />
+      </AssistantActionBar.Root>
+    </AssistantMessage.Root>
+  );
+};
+
+const AutomaticSpeak = () => {
+  const message = useMessage();
+  const { speak } = useMessageRuntime();
+
+  useEffect(() => {
+    if (message.status?.type === "complete") {
+      speak();
+    }
+  }, [message.status, speak]);
+
+  return <AssistantActionBar.SpeechControl />;
+};
+
 const MyComposer = () => {
   return (
     <Composer.Root>
-      <ComposerRecord />
-      <Composer.Input />
-      <Composer.Send />
+      <Composer.Input autoFocus />
+      <div className="flex gap-2">
+        <ComposerRecord />
+        <Composer.Send />
+      </div>
     </Composer.Root>
   );
 };
 
-const blobToAudioBuffer = async (data: Blob): Promise<AudioBuffer> => {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.onloadend = async () => {
-      const audioCTX = new AudioContext({
-        sampleRate: Constants.SAMPLING_RATE,
-      });
-
-      const arrayBuffer = fileReader.result as ArrayBuffer;
-      const decoded = await audioCTX.decodeAudioData(arrayBuffer);
-
-      resolve(decoded);
-    };
-    fileReader.onerror = reject;
-    fileReader.readAsArrayBuffer(data);
-  });
-};
-
 const ComposerRecord = () => {
   const runtime = useComposerRuntime();
-  const { output, start, isModelLoading, isBusy } = useTranscriber();
 
-  const setAudioFromRecording = async (data: Blob) => {
-    const decoded = await blobToAudioBuffer(data);
-    start(decoded);
+  const onRecordedComplete = (text: string) => {
+    runtime.setText(text.trim());
+    runtime.send();
   };
 
-  useEffect(() => {
-    if (output && output.isBusy === false) {
-      runtime.setText(output.text.trim());
-      runtime.send();
-    }
-  }, [output]);
-
-  return (
-    <AudioRecorder
-      onComplete={setAudioFromRecording}
-      disabled={isModelLoading || isBusy}
-    />
-  );
+  return <AudioRecord onComplete={onRecordedComplete} />;
 };

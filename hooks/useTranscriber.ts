@@ -142,12 +142,14 @@ export function useTranscriber(): Transcriber {
           audio = audioData.getChannelData(0);
         }
 
+        console.log(language);
+
         webWorker.postMessage({
           audio,
           model,
-          multilingual,
-          subtask: multilingual ? subtask : null,
-          language: multilingual && language !== "auto" ? language : null,
+          multilingual: false,
+          subtask: null,
+          language,
         });
       }
     },
