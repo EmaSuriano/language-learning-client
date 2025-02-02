@@ -67,11 +67,8 @@ export default function AudioRecord({
       formData.append("file", audioBlob, "recording.wav");
 
       const response = await fetch(
-        "http://localhost:8000/v1/audio/transcriptions",
-        {
-          method: "POST",
-          body: formData,
-        }
+        process.env["NEXT_PUBLIC_ASSISTANT_URL"]! + "/v1/audio/transcriptions",
+        { method: "POST", body: formData }
       );
 
       if (!response.ok) {

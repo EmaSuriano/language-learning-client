@@ -16,13 +16,11 @@ interface CacheEntry {
 }
 
 export class ApiSpeechSynthesisAdapter implements SpeechSynthesisAdapter {
-  private audio: HTMLAudioElement | null;
   private baseUrl: string;
   private cache: Map<string, CacheEntry>;
 
-  constructor(baseUrl: string = "http://localhost:8000") {
+  constructor(baseUrl: string = process.env["NEXT_PUBLIC_ASSISTANT_URL"]!) {
     this.baseUrl = baseUrl;
-    this.audio = null;
     this.cache = new Map();
   }
 
