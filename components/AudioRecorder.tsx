@@ -2,7 +2,13 @@
 
 import { useState, useRef } from "react";
 import { SpeakerLoudIcon, StopIcon, UpdateIcon } from "@radix-ui/react-icons";
-import { Composer } from "@assistant-ui/react";
+import {
+  Composer,
+  useComposerRuntime,
+  useEditComposer,
+  useMessageRuntime,
+  useThreadRuntime,
+} from "@assistant-ui/react";
 
 type TranscriptionResponse = {
   text: string;
@@ -10,17 +16,22 @@ type TranscriptionResponse = {
 
 export default function AudioRecord({
   onComplete,
+  language,
 }: {
   onComplete: (text: string) => void;
+  language: string;
 }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const asd = useThreadRuntime();
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
+    // in case the assistant is speaking, stop it so the user can record
+    asd.stopSpeaking();
     try {
       setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -62,12 +73,13 @@ export default function AudioRecord({
 
   const sendAudioToServer = async (audioBlob: Blob) => {
     setIsLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("file", audioBlob, "recording.wav");
 
       const response = await fetch(
-        process.env["NEXT_PUBLIC_ASSISTANT_URL"]! + "/v1/audio/transcriptions",
+        `${process.env["NEXT_PUBLIC_ASSISTANT_URL"]}/stt/transcribe?language=${language}`,
         { method: "POST", body: formData }
       );
 

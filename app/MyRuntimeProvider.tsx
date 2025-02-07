@@ -9,7 +9,7 @@ import {
   type ChatModelAdapter,
 } from "@assistant-ui/react";
 import { ApiSpeechSynthesisAdapter } from "@/components/ApiSpeechSynthesisAdapter";
-import { handleStreamResponse } from "@/lib/createModelStream";
+import Settings from "@/lib/Settings";
 
 interface OutputMessage {
   role: string;
@@ -26,116 +26,35 @@ const mapMessages = (messages: ThreadMessage[]): OutputMessage[] => {
   }));
 };
 
-const MyModelAdapter: ChatModelAdapter = {
-  run({ messages, abortSignal }) {
-    // TODO replace with your own API
+async function* handleStreamResponse(response: Response) {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error("Response body is null");
+  }
 
-    // Log the stream in parallel
-    return (async function* () {
-      const response = await fetch(
-        process.env["NEXT_PUBLIC_ASSISTANT_URL"]! + "/v1/assistant/chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-          },
-          body: JSON.stringify({ messages: mapMessages([...messages]) }),
-          signal: abortSignal,
-        }
-      );
+  const decoder = new TextDecoder();
+  let accumulatedText = "";
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+  // Initial yield with running status
+  yield {
+    status: { type: "running" },
+    content: [
+      {
+        type: "text",
+        text: accumulatedText,
+      },
+    ],
+  };
 
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error("Response body is null");
-      }
-
-      const decoder = new TextDecoder();
-      let accumulatedText = "";
-
-      // Initial yield with running status
-      yield {
-        status: { type: "running" },
-        content: [
-          {
-            type: "text",
-            text: accumulatedText,
-          },
-        ],
-      };
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            // Final yield with complete status
-            yield {
-              status: {
-                type: "complete",
-                reason: "stop",
-              },
-              content: [
-                {
-                  type: "text",
-                  text: accumulatedText,
-                },
-              ],
-            };
-            break;
-          }
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(5).trim();
-
-              if (data === "[DONE]") {
-                return;
-              }
-
-              try {
-                const { content } = JSON.parse(data);
-                accumulatedText += content;
-
-                yield {
-                  status: { type: "running" },
-                  content: [
-                    {
-                      type: "text",
-                      text: accumulatedText,
-                    },
-                  ],
-                };
-              } catch (e) {
-                yield {
-                  status: {
-                    type: "incomplete",
-                    reason: "error",
-                    error: String(e),
-                  },
-                  content: [
-                    {
-                      type: "text",
-                      text: accumulatedText,
-                    },
-                  ],
-                };
-              }
-            }
-          }
-        }
-      } catch (error) {
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        // Final yield with complete status
         yield {
           status: {
-            type: "incomplete",
-            reason: "error",
-            error: String(error),
+            type: "complete",
+            reason: "stop",
           },
           content: [
             {
@@ -144,9 +63,97 @@ const MyModelAdapter: ChatModelAdapter = {
             },
           ],
         };
-      } finally {
-        reader.releaseLock();
+        break;
       }
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split("\n");
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const data = line.slice(5).trim();
+
+          if (data === "[DONE]") {
+            return;
+          }
+
+          try {
+            const { content } = JSON.parse(data);
+            accumulatedText += content;
+
+            yield {
+              status: { type: "running" },
+              content: [
+                {
+                  type: "text",
+                  text: accumulatedText,
+                },
+              ],
+            };
+          } catch (e) {
+            yield {
+              status: {
+                type: "incomplete",
+                reason: "error",
+                error: String(e),
+              },
+              content: [
+                {
+                  type: "text",
+                  text: accumulatedText,
+                },
+              ],
+            };
+          }
+        }
+      }
+    }
+  } catch (error) {
+    yield {
+      status: {
+        type: "incomplete",
+        reason: "error",
+        error: String(error),
+      },
+      content: [
+        {
+          type: "text",
+          text: accumulatedText,
+        },
+      ],
+    };
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+const MyModelAdapter: ChatModelAdapter = {
+  run({ messages, abortSignal }) {
+    // TODO replace with your own API
+
+    // Log the stream in parallel
+    return (async function* () {
+      const response = await fetch(
+        process.env["NEXT_PUBLIC_ASSISTANT_URL"]! + "/assistant/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+          },
+          body: JSON.stringify({
+            messages: mapMessages([...messages]),
+            language: Settings.LANGUAGE,
+          }),
+          signal: abortSignal,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      yield* handleStreamResponse(response);
     })();
   },
 };

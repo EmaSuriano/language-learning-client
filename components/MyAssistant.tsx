@@ -15,6 +15,9 @@ import {
 } from "@assistant-ui/react";
 
 import AudioRecord from "./AudioRecorder";
+import Settings from "@/lib/Settings";
+import { MyComposer } from "./MyComposer";
+import { MyAssistantMessage } from "./MyAssistanceMessage";
 
 export function MyAssistant() {
   return (
@@ -62,56 +65,3 @@ export function MyAssistant() {
     </>
   );
 }
-
-const MyAssistantMessage = () => {
-  return (
-    <AssistantMessage.Root>
-      <AssistantMessage.Avatar />
-      <AssistantMessage.Content />
-      <BranchPicker />
-      <AssistantActionBar.Root>
-        <AutomaticSpeak />
-        <AssistantActionBar.Copy />
-      </AssistantActionBar.Root>
-    </AssistantMessage.Root>
-  );
-};
-
-const AutomaticSpeak = () => {
-  const runtime = useComposerRuntime();
-
-  console.log(runtime.getState());
-  const message = useMessage();
-  const { speak } = useMessageRuntime();
-
-  useEffect(() => {
-    if (message.status?.type === "complete") {
-      speak();
-    }
-  }, [message.status, speak]);
-
-  return <AssistantActionBar.SpeechControl />;
-};
-
-const MyComposer = () => {
-  return (
-    <Composer.Root>
-      <ComposerRecord />
-      <Composer.Input autoFocus />
-      <div className="flex gap-2">
-        <Composer.Send />
-      </div>
-    </Composer.Root>
-  );
-};
-
-const ComposerRecord = () => {
-  const runtime = useComposerRuntime();
-
-  const onRecordedComplete = (text: string) => {
-    runtime.setText(text.trim());
-    runtime.send();
-  };
-
-  return <AudioRecord onComplete={onRecordedComplete} />;
-};

@@ -1,9 +1,11 @@
 "use client";
 
+import Settings from "@/lib/Settings";
 import { SpeechSynthesisAdapter } from "@assistant-ui/react";
 
 interface TTSRequest {
   input: string;
+  language: string;
   voice: string;
   response_format: "mp3";
   stream: boolean;
@@ -86,13 +88,14 @@ export class ApiSpeechSynthesisAdapter implements SpeechSynthesisAdapter {
       // Fetch new audio
       const requestBody: TTSRequest = {
         input: text,
-        voice: "af_sky",
+        language: Settings.LANGUAGE,
+        voice: "em_santa",
         response_format: "mp3",
         stream: true,
         speed: 1,
       };
 
-      fetch(`${this.baseUrl}/v1/audio/speech`, {
+      fetch(`${this.baseUrl}/tts/synthesize`, {
         method: "POST",
         headers: {
           Accept: "*/*",
