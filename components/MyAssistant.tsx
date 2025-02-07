@@ -18,8 +18,11 @@ import AudioRecord from "./AudioRecorder";
 import Settings from "@/lib/Settings";
 import { MyComposer } from "./MyComposer";
 import { MyAssistantMessage } from "./MyAssistanceMessage";
+import { useTranslations } from "next-intl";
 
 export function MyAssistant() {
+  const t = useTranslations();
+
   return (
     <>
       <div className="flex h-full">
@@ -30,7 +33,7 @@ export function MyAssistant() {
           <Thread
             strings={{
               welcome: {
-                message: "Ready to start a language exchange?",
+                message: t("welcome", { name: "Ema" }),
               },
             }}
             welcome={{

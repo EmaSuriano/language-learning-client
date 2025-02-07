@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Suspense } from "react";
 import { MyRuntimeProvider } from "./MyRuntimeProvider";
+import IntlProvider from "@/components/IntlProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,13 +33,15 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <ThemeProvider
-            attribute="class"
-            storageKey="nightwind-mode"
-            defaultTheme="system" // default "light"
-          >
-            <Suspense>{children}</Suspense>
-          </ThemeProvider>
+          <IntlProvider>
+            <ThemeProvider
+              attribute="class"
+              storageKey="nightwind-mode"
+              defaultTheme="system" // default "light"
+            >
+              <Suspense>{children}</Suspense>
+            </ThemeProvider>
+          </IntlProvider>
         </body>
       </html>
     </MyRuntimeProvider>
