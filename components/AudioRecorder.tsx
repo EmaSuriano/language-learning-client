@@ -2,13 +2,7 @@
 
 import { useState, useRef } from "react";
 import { SpeakerLoudIcon, StopIcon, UpdateIcon } from "@radix-ui/react-icons";
-import {
-  Composer,
-  useComposerRuntime,
-  useEditComposer,
-  useMessageRuntime,
-  useThreadRuntime,
-} from "@assistant-ui/react";
+import { Composer, useThreadRuntime } from "@assistant-ui/react";
 
 type TranscriptionResponse = {
   text: string;
@@ -24,14 +18,18 @@ export default function AudioRecord({
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const asd = useThreadRuntime();
-
+  const threadRuntime = useThreadRuntime();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
     // in case the assistant is speaking, stop it so the user can record
-    asd.stopSpeaking();
+    try {
+      threadRuntime.stopSpeaking();
+    } catch (e) {
+      console.error("Ignore error because it was not speaking...");
+    }
+
     try {
       setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

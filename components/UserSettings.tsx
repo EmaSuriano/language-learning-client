@@ -8,8 +8,10 @@ import { User, UserUpdate, useUserStore } from "@/hooks/useUserStore";
 import { useEffect, useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon, SpeakerLoudIcon } from "@radix-ui/react-icons";
+import { Cross2Icon, GearIcon } from "@radix-ui/react-icons";
 import { useLanguageStore } from "@/hooks/useLanguageStore";
+import { useTTSStore } from "@/hooks/useTTSStore";
+import { formatVoiceTitle } from "@/lib/helpers";
 
 export default function UserSettings() {
   const { user, createUser, fetchUser, updateUser } = useUserStore();
@@ -26,7 +28,14 @@ export default function UserSettings() {
     );
   }
 
-  return <UserSettingsDialog user={user} onUpdate={updateUser} />;
+  const onUpdate = async (update: UserUpdate) =>
+    updateUser(update).then(() => {
+      if (update.language_code !== user.current_language.code) {
+        window.location.reload();
+      }
+    });
+
+  return <UserSettingsDialog user={user} onUpdate={onUpdate} />;
 }
 
 const UserSettingsDialog = ({
@@ -36,12 +45,29 @@ const UserSettingsDialog = ({
   user: User;
   onUpdate: (user: UserUpdate) => Promise<void>;
 }) => {
-  const { languages, fetchLanguages, isLoading } = useLanguageStore();
+  const { languages, fetchLanguages } = useLanguageStore();
+  const { supportedLanguages, voices, fetchSupportedLanguages, fetchVoices } =
+    useTTSStore();
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    user.current_language
+  );
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     fetchLanguages();
+    fetchSupportedLanguages();
   }, []);
+
+  useEffect(() => {
+    if (selectedLanguage.has_tts) {
+      const ttsCode = supportedLanguages.find((l) =>
+        l.startsWith(selectedLanguage.code)
+      );
+      if (ttsCode) {
+        fetchVoices(ttsCode);
+      }
+    }
+  }, [selectedLanguage, languages, supportedLanguages]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,26 +75,45 @@ const UserSettingsDialog = ({
 
     onUpdate({
       language_level: Number(formData.get("language_level")),
-      language_code: String(formData.get("language_code")),
+      language_code: selectedLanguage.code,
       interests: (formData.get("interests") as string)
         .split(",")
         .map((i) => i.trim()),
+      voice_id: selectedLanguage.has_tts
+        ? (formData.get("voice_id") as string)
+        : null,
     }).then(() => setOpen(false));
   };
 
+  const onOpenChange = (open: boolean) => {
+    if (open === true) {
+      setSelectedLanguage(user.current_language);
+    }
+
+    setOpen(open);
+  };
+
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>
-        <button className="inline-flex h-9 items-center justify-center rounded bg-violet-100 px-4 font-medium">
-          User Settings
-        </button>
+        <div className="fixed top-6 left-6">
+          <button className="inline-flex h-9 items-center justify-center rounded bg-violet-100 px-4 font-medium">
+            <GearIcon />
+          </button>
+        </div>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40" />
         <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-6 shadow-lg">
-          <Dialog.Title className="text-lg font-medium">
-            User Settings
+          <Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">
+            User settings
           </Dialog.Title>
+          {selectedLanguage.code !== user.current_language.code && (
+            <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal text-red-500">
+              Changing the language will reset your chat.
+            </Dialog.Description>
+          )}
+
           <form onSubmit={handleSubmit}>
             <fieldset className="mb-4 flex items-center gap-4">
               <label className="w-24 text-right text-sm" htmlFor="language">
@@ -80,6 +125,12 @@ const UserSettingsDialog = ({
                   id="language_code"
                   name="language_code"
                   defaultValue={user.current_language.code}
+                  value={selectedLanguage.code}
+                  onChange={(e) =>
+                    setSelectedLanguage(
+                      languages.find((l) => l.code === e.target.value)!
+                    )
+                  }
                 >
                   {languages.map((lang) => (
                     <option key={lang.code} value={lang.code}>
@@ -88,6 +139,29 @@ const UserSettingsDialog = ({
                   ))}
                 </select>
               </div>
+            </fieldset>
+
+            <fieldset className="mb-4 flex items-center gap-4">
+              <label className="w-24 text-right text-sm" htmlFor="voice">
+                Voice
+              </label>
+
+              {selectedLanguage.has_tts ? (
+                <select
+                  className="h-9 w-full rounded border px-2"
+                  id="voice_id"
+                  name="voice_id"
+                  defaultValue={user.voice_id || undefined}
+                >
+                  {voices.map((voice) => (
+                    <option key={voice} value={voice}>
+                      {formatVoiceTitle(voice)}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                "No voice for this language"
+              )}
             </fieldset>
 
             <fieldset className="mb-4 flex items-center gap-4">

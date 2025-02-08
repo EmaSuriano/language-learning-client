@@ -1,47 +1,62 @@
 {
   "en": {
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "hello": "Hello"
   },
   "ar": {
-    "welcome": "\u0645\u0631\u062d\u0628\u0627"
+    "welcome": "\u0645\u0631\u062d\u0628\u0627",
+    "hello": "\u0633\u0644\u0627\u0645"
   },
   "de": {
-    "welcome": "Willkommen"
+    "welcome": "Willkommen",
+    "hello": "Hallo"
   },
   "es": {
-    "welcome": "Bienvenido"
+    "welcome": "Bienvenido",
+    "hello": "Hola"
   },
   "fr": {
-    "welcome": "Bienvenue"
+    "welcome": "Bienvenue",
+    "hello": "Bonjour"
   },
   "hi": {
-    "welcome": "\u092f\u0939 \u092c\u093f\u0928\u094d\u0926\u0928 \u0939\u0948"
+    "welcome": "\u092f\u0939 \u092c\u093f\u0928\u094d\u0926\u0928 \u0939\u0948",
+    "hello": "\u0928\u092e\u0938\u094d\u0924\u0947"
   },
   "it": {
-    "welcome": "Benvenuto"
+    "welcome": "Benvenuto",
+    "hello": "Ciao"
   },
   "ja": {
-    "welcome": "\u3088\u3046\u3053\u305d"
+    "welcome": "\u3088\u3046\u3053\u305d",
+    "hello": "\u3053\u3093\u306b\u3061\u306f"
   },
   "ko": {
-    "welcome": "\uD658\uC601\uD569\uB2C8\uB2E4"
+    "welcome": "\uD658\uC601\uD569\uB2C8\uB2E4",
+    "hello": "\uC548\uB155\uD558\uC138\uC694"
   },
   "nl": {
-    "welcome": "Welkom"
+    "welcome": "Welkom",
+    "hello": "Hallo"
   },
   "pt": {
-    "welcome": "Bem-vindo"
+    "welcome": "Bem-vindo",
+    "hello": "Olá"
   },
   "ru": {
-    "welcome": "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c"
+    "welcome": "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c",
+    "hello": "\u041f\u0440\u0438\u0432\u0435\u0442"
   },
   "tr": {
-    "welcome": "Hoş geldiniz"
+    "welcome": "Hoş geldiniz",
+    "hello": "Merhaba"
   },
   "uk": {
-    "welcome": "\u041B\u0430\u0441\u043A\u0430\u0432\u043E \u043F\u0440\u043E\u0441\u0438\u043C\u043E"
+    "welcome": "\u041B\u0430\u0441\u043A\u0430\u0432\u043E \u043F\u0440\u043E\u0441\u0438\u043C\u043E",
+    "hello": "\u041f\u0440\u0438\u0432\u0456\u0442"
   },
   "zh": {
-    "welcome": "\u6B22\u8FCE"
+    "welcome": "\u6B22\u8FCE",
+    "hello": "\u4F60\u597D"
   }
 }

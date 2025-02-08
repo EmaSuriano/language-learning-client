@@ -10,23 +10,14 @@ import {
 } from "@assistant-ui/react";
 import { ApiSpeechSynthesisAdapter } from "@/components/ApiSpeechSynthesisAdapter";
 import Settings from "@/lib/Settings";
+import { useLocaleStore } from "@/hooks/useLocaleStore";
+import { User, useUserStore } from "@/hooks/useUserStore";
+import { mapToChatMessage } from "@/lib/ChatMessage";
+import { Situation, useSituationStore } from "@/hooks/useSituationStore";
 
-interface OutputMessage {
-  role: string;
-  content: string;
-}
-
-const mapMessages = (messages: ThreadMessage[]): OutputMessage[] => {
-  return messages.map((msg) => ({
-    role: msg.role,
-    content: msg.content
-      .filter((c) => c.type === "text")
-      .map((c) => c.text)
-      .join(" "),
-  }));
-};
-
-async function* handleStreamResponse(response: Response) {
+async function* handleStreamResponse(
+  response: Response
+): AsyncGenerator<ChatModelRunResult, void> {
   const reader = response.body?.getReader();
   if (!reader) {
     throw new Error("Response body is null");
@@ -38,12 +29,7 @@ async function* handleStreamResponse(response: Response) {
   // Initial yield with running status
   yield {
     status: { type: "running" },
-    content: [
-      {
-        type: "text",
-        text: accumulatedText,
-      },
-    ],
+    content: [{ type: "text", text: accumulatedText }],
   };
 
   try {
@@ -52,16 +38,8 @@ async function* handleStreamResponse(response: Response) {
       if (done) {
         // Final yield with complete status
         yield {
-          status: {
-            type: "complete",
-            reason: "stop",
-          },
-          content: [
-            {
-              type: "text",
-              text: accumulatedText,
-            },
-          ],
+          status: { type: "complete", reason: "stop" },
+          content: [{ type: "text", text: accumulatedText }],
         };
         break;
       }
@@ -83,26 +61,12 @@ async function* handleStreamResponse(response: Response) {
 
             yield {
               status: { type: "running" },
-              content: [
-                {
-                  type: "text",
-                  text: accumulatedText,
-                },
-              ],
+              content: [{ type: "text", text: accumulatedText }],
             };
           } catch (e) {
             yield {
-              status: {
-                type: "incomplete",
-                reason: "error",
-                error: String(e),
-              },
-              content: [
-                {
-                  type: "text",
-                  text: accumulatedText,
-                },
-              ],
+              status: { type: "incomplete", reason: "error", error: String(e) },
+              content: [{ type: "text", text: accumulatedText }],
             };
           }
         }
@@ -110,52 +74,53 @@ async function* handleStreamResponse(response: Response) {
     }
   } catch (error) {
     yield {
-      status: {
-        type: "incomplete",
-        reason: "error",
-        error: String(error),
-      },
-      content: [
-        {
-          type: "text",
-          text: accumulatedText,
-        },
-      ],
+      status: { type: "incomplete", reason: "error", error: String(error) },
+      content: [{ type: "text", text: accumulatedText }],
     };
   } finally {
     reader.releaseLock();
   }
 }
 
-const MyModelAdapter: ChatModelAdapter = {
-  run({ messages, abortSignal }) {
-    // TODO replace with your own API
+const buildModelAdapter = ({
+  user,
+  situation,
+}: {
+  user: User;
+  situation: Situation;
+}): ChatModelAdapter => {
+  return {
+    run({ messages, abortSignal, ...rest }) {
+      console.log(rest);
+      // TODO replace with your own API
 
-    // Log the stream in parallel
-    return (async function* () {
-      const response = await fetch(
-        process.env["NEXT_PUBLIC_ASSISTANT_URL"]! + "/assistant/chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-          },
-          body: JSON.stringify({
-            messages: mapMessages([...messages]),
-            language: Settings.LANGUAGE,
-          }),
-          signal: abortSignal,
+      // Log the stream in parallel
+      return (async function* () {
+        const response = await fetch(
+          process.env["NEXT_PUBLIC_ASSISTANT_URL"]! + "/assistant/chat",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "text/event-stream",
+            },
+            body: JSON.stringify({
+              messages: messages.map(mapToChatMessage),
+              user_id: user.id,
+              situation_id: situation.id,
+            }),
+            signal: abortSignal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      yield* handleStreamResponse(response);
-    })();
-  },
+        yield* handleStreamResponse(response);
+      })();
+    },
+  };
 };
 
 export function MyRuntimeProvider({
@@ -163,8 +128,19 @@ export function MyRuntimeProvider({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const { locale, voice } = useLocaleStore();
+  const { user } = useUserStore();
+  const { selectedSituation } = useSituationStore();
+
+  const MyModelAdapter = buildModelAdapter({
+    user: user!,
+    situation: selectedSituation!,
+  });
+
   const runtime = useLocalRuntime(MyModelAdapter, {
-    adapters: { speech: new ApiSpeechSynthesisAdapter() },
+    adapters: {
+      speech: new ApiSpeechSynthesisAdapter({ language: locale, voice }),
+    },
   });
 
   return (

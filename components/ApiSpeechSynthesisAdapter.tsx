@@ -19,11 +19,23 @@ interface CacheEntry {
 
 export class ApiSpeechSynthesisAdapter implements SpeechSynthesisAdapter {
   private baseUrl: string;
+  private language: string;
+  private voice: string | null;
   private cache: Map<string, CacheEntry>;
 
-  constructor(baseUrl: string = process.env["NEXT_PUBLIC_ASSISTANT_URL"]!) {
+  constructor({
+    baseUrl = process.env["NEXT_PUBLIC_ASSISTANT_URL"]!,
+    language,
+    voice,
+  }: {
+    language: string;
+    baseUrl?: string;
+    voice: string | null;
+  }) {
     this.baseUrl = baseUrl;
     this.cache = new Map();
+    this.language = language;
+    this.voice = voice;
   }
 
   private createAudioFromCache(cacheEntry: CacheEntry): HTMLAudioElement {
@@ -33,6 +45,17 @@ export class ApiSpeechSynthesisAdapter implements SpeechSynthesisAdapter {
   }
 
   speak(text: string): SpeechSynthesisAdapter.Utterance {
+    // if (this.voice === null) {
+    //   // No voice set, return immediately
+    //   return {
+    //     status: { type: "ended", reason: "finished" },
+    //     cancel: () => {},
+    //     subscribe: (cb) => () => {
+    //       cb();
+    //     },
+    //   };
+    // }
+
     const subscribers = new Set<() => void>();
     let currentAudio = new Audio();
 
@@ -85,11 +108,15 @@ export class ApiSpeechSynthesisAdapter implements SpeechSynthesisAdapter {
       setupAudioElement(currentAudio);
       currentAudio.play().catch((error) => handleEnd("error", error));
     } else {
+      if (this.voice === null) {
+        handleEnd("finished");
+        return res;
+      }
       // Fetch new audio
       const requestBody: TTSRequest = {
         input: text,
-        language: Settings.LANGUAGE,
-        voice: "em_santa",
+        language: this.language,
+        voice: this.voice,
         response_format: "mp3",
         stream: true,
         speed: 1,
