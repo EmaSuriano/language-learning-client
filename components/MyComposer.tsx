@@ -1,17 +1,10 @@
 "use client";
 
-import { MouseEventHandler, use, useEffect, useState } from "react";
-import {
-  Composer,
-  ThreadWelcome,
-  useComposerRuntime,
-  useThreadRuntime,
-} from "@assistant-ui/react";
+import { Composer, useComposerRuntime } from "@assistant-ui/react";
 
 import AudioRecord from "./AudioRecorder";
 import { useLocaleStore } from "@/hooks/useLocaleStore";
 import ChatHint from "./ChatHint";
-import { useSituationStore } from "@/hooks/useSituationStore";
 
 export const MyComposer = () => {
   return (
