@@ -1,62 +1,92 @@
 {
   "en": {
     "welcome": "Welcome",
-    "hello": "Hello"
+    "hello": "Hello",
+    "excuse-me": "Excuse me",
+    "ask-you-something": "Can I ask you something?"
   },
   "ar": {
     "welcome": "\u0645\u0631\u062d\u0628\u0627",
-    "hello": "\u0633\u0644\u0627\u0645"
+    "hello": "\u0633\u0644\u0627\u0645",
+    "excuse-me": "\u0639\u0641\u0648\u0627\u064B",
+    "ask-you-something": "\u0647\u0644 \u064A\u0645\u0643\u0646\u0646\u064A \u0633\u0624\u0627\u0644\u0643 \u0634\u064A\u0626\u0627\u061F"
   },
   "de": {
     "welcome": "Willkommen",
-    "hello": "Hallo"
+    "hello": "Hallo",
+    "excuse-me": "Entschuldigung",
+    "ask-you-something": "Kann ich dich etwas fragen?"
   },
   "es": {
     "welcome": "Bienvenido",
-    "hello": "Hola"
+    "hello": "Hola",
+    "excuse-me": "Perdón",
+    "ask-you-something": "¿Puedo preguntarte algo?"
   },
   "fr": {
     "welcome": "Bienvenue",
-    "hello": "Bonjour"
+    "hello": "Bonjour",
+    "excuse-me": "Excusez-moi",
+    "ask-you-something": "Puis-je te demander quelque chose?"
   },
   "hi": {
     "welcome": "\u092f\u0939 \u092c\u093f\u0928\u094d\u0926\u0928 \u0939\u0948",
-    "hello": "\u0928\u092e\u0938\u094d\u0924\u0947"
+    "hello": "\u0928\u092e\u0938\u094d\u0924\u0947",
+    "excuse-me": "\u092E\u093E\u092B \u0915\u0930\u0928\u093E",
+    "ask-you-something": "\u0915\u094D\u092F\u093E \u092E\u0948\u0902 \u0906\u092A\u0938\u0947 \u0915\u0941\u091B \u092A\u0942\u091B \u0938\u0915\u0924\u093E \u0939\u0942\u0902?"
   },
   "it": {
     "welcome": "Benvenuto",
-    "hello": "Ciao"
+    "hello": "Ciao",
+    "excuse-me": "Scusami",
+    "ask-you-something": "Posso chiederti qualcosa?"
   },
   "ja": {
     "welcome": "\u3088\u3046\u3053\u305d",
-    "hello": "\u3053\u3093\u306b\u3061\u306f"
+    "hello": "\u3053\u3093\u306b\u3061\u306f",
+    "excuse-me": "\u3059\u307F\u307E\u305B\u3093",
+    "ask-you-something": "\u304A\u805E\u304D\u3057\u3066\u3082\u3044\u3044\u3067\u3059\u304B?"
   },
   "ko": {
     "welcome": "\uD658\uC601\uD569\uB2C8\uB2E4",
-    "hello": "\uC548\uB155\uD558\uC138\uC694"
+    "hello": "\uC548\uB155\uD558\uC138\uC694",
+    "excuse-me": "\uC81C\uBC1C",
+    "ask-you-something": "\uBB34\uC2A8 \uC77C\uC774\uB4E4\uC5B4\uB3C4 \uB420\uAE4C\uC694?"
   },
   "nl": {
     "welcome": "Welkom",
-    "hello": "Hallo"
+    "hello": "Hallo",
+    "excuse-me": "Pardon",
+    "ask-you-something": "Mag ik je iets vragen?"
   },
   "pt": {
     "welcome": "Bem-vindo",
-    "hello": "Olá"
+    "hello": "Olá",
+    "excuse-me": "Desculpe",
+    "ask-you-something": "Posso te perguntar uma coisa?"
   },
   "ru": {
     "welcome": "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c",
-    "hello": "\u041f\u0440\u0438\u0432\u0435\u0442"
+    "hello": "\u041f\u0440\u0438\u0432\u0435\u0442",
+    "excuse-me": "\u0418\u0437\u0432\u0438\u043D\u0438\u0442\u0435",
+    "ask-you-something": "\u041c\u043e\u0433\u0443 \u044f \u0442\u0435\u0431\u044f \u0447\u0442\u043e-\u0442\u043e \u0441\u043f\u0440\u043e\u0441\u0438\u0442\u044c?"
   },
   "tr": {
     "welcome": "Hoş geldiniz",
-    "hello": "Merhaba"
+    "hello": "Merhaba",
+    "excuse-me": "Afedersiniz",
+    "ask-you-something": "Sana bir şey sorabilir miyim?"
   },
   "uk": {
-    "welcome": "\u041B\u0430\u0441\u043A\u0430\u0432\u043E \u043F\u0440\u043E\u0441\u0438\u043C\u043E",
-    "hello": "\u041f\u0440\u0438\u0432\u0456\u0442"
+    "welcome": "\u041b\u0430\u0441\u043a\u0430\u0432\u043e \u043f\u0440\u043e\u0441\u0438\u043c\u043e",
+    "hello": "\u041f\u0440\u0438\u0432\u0456\u0442",
+    "excuse-me": "\u0412\u0438\u0431\u0430\u0447\u0442\u0435",
+    "ask-you-something": "\u0427\u0438 \u043c\u043e\u0436\u0443 \u044f \u0442\u0435\u0431\u0435 \u0449\u043e\u0441\u044c \u0437\u0430\u043f\u0438\u0442\u0430\u0442\u0438?"
   },
   "zh": {
     "welcome": "\u6B22\u8FCE",
-    "hello": "\u4F60\u597D"
+    "hello": "\u4F60\u597D",
+    "excuse-me": "\u62B1\u6B49",
+    "ask-you-something": "\u6211\u80FD\u95EE\u4F60\u4E00\u4E2A\u95EE\u9898\u5417?"
   }
 }

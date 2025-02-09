@@ -1,6 +1,6 @@
 "use client";
 import { makeMarkdownText } from "@assistant-ui/react-markdown";
-import { Thread, ThreadList } from "@assistant-ui/react";
+import { Thread } from "@assistant-ui/react";
 
 import { MyComposer } from "./MyComposer";
 import { MyAssistantMessage } from "./MyAssistanceMessage";
@@ -19,11 +19,8 @@ export function MyAssistant() {
       welcome={{
         suggestions: [
           { prompt: t("hello") },
-          { prompt: "tell me a one line joke" },
-          { prompt: "Can you teach me something new?" },
-          {
-            prompt: "Can you provide feedback from our last conversation?",
-          },
+          { prompt: t("excuse-me") },
+          { prompt: t("ask-you-something") },
         ],
       }}
       branchPicker={{

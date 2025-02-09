@@ -1,28 +1,17 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
-import { makeMarkdownText } from "@assistant-ui/react-markdown";
+import { useEffect } from "react";
 import {
-  Thread,
-  Composer,
   AssistantMessage,
   useMessageRuntime,
   AssistantActionBar,
-  useComposerRuntime,
-  BranchPicker,
   useMessage,
-  ThreadList,
 } from "@assistant-ui/react";
-
-import AudioRecord from "./AudioRecorder";
-import Settings from "@/lib/Settings";
 
 export const MyAssistantMessage = () => {
   return (
     <AssistantMessage.Root>
       <AssistantMessage.Avatar />
       <AssistantMessage.Content />
-      <BranchPicker />
       <AssistantActionBar.Root>
         <AutomaticSpeak />
         <AssistantActionBar.Copy />

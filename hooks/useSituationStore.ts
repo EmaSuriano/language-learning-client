@@ -1,7 +1,6 @@
 // src/store/useSituationStore.ts
 import { create } from "zustand";
 import { z } from "zod";
-import { persist } from "zustand/middleware";
 
 export const SituationSchema = z.object({
   id: z.number(),
@@ -33,45 +32,40 @@ interface SituationState {
 
 const API_URL = `${process.env["NEXT_PUBLIC_ASSISTANT_URL"]}/situations`;
 
-export const useSituationStore = create<SituationState>()(
-  persist(
-    (set, get) => ({
-      situations: [],
-      selectedSituation: null,
-      progress: [],
-      isLoading: false,
-      error: null,
+export const useSituationStore = create<SituationState>()((set, get) => ({
+  situations: [],
+  selectedSituation: null,
+  progress: [],
+  isLoading: false,
+  error: null,
 
-      fetchSituations: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          const response = await fetch(API_URL);
-          if (!response.ok) throw new Error("Failed to fetch situations");
+  fetchSituations: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error("Failed to fetch situations");
 
-          const data = await response.json();
-          const situations = z.array(SituationSchema).parse(data);
+      const data = await response.json();
+      const situations = z.array(SituationSchema).parse(data);
 
-          const sortedSituations = [...situations].sort((a, b) => a.id - b.id);
+      const sortedSituations = [...situations].sort((a, b) => a.id - b.id);
 
-          set({ situations: sortedSituations, isLoading: false });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Invalid data",
-            isLoading: false,
-          });
-        }
-      },
+      set({ situations: sortedSituations, isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : "Invalid data",
+        isLoading: false,
+      });
+    }
+  },
 
-      selectSituation: (situationId: number) => {
-        const { situations } = get();
-        const situation = situations.find((s) => s.id === situationId);
-        if (situation) {
-          set({ selectedSituation: situation });
-        } else {
-          set({ error: `Situation with id ${situationId} not found` });
-        }
-      },
-    }),
-    { name: "situation-store" }
-  )
-);
+  selectSituation: (situationId: number) => {
+    const { situations } = get();
+    const situation = situations.find((s) => s.id === situationId);
+    if (situation) {
+      set({ selectedSituation: situation });
+    } else {
+      set({ error: `Situation with id ${situationId} not found` });
+    }
+  },
+}));
