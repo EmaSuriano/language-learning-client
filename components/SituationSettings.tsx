@@ -115,7 +115,7 @@ const SituationSettings = () => {
               <button
                 disabled={currentSituation === null}
                 type="submit"
-                className="inline-flex h-[35px] items-center justify-center rounded bg-violet4 px-[15px] font-medium leading-none text-violet11 outline-none hover:bg-violet5"
+                className="disabled:bg-violet2 disabled:text-violet5 inline-flex h-[35px] items-center justify-center rounded bg-violet4 px-[15px] font-medium leading-none text-violet11 outline-none hover:bg-violet5"
               >
                 Save changes
               </button>

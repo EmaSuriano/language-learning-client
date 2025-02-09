@@ -19,65 +19,74 @@ import {
   BarChartIcon,
   CheckCircledIcon,
   CircleIcon,
+  StarIcon,
 } from "@radix-ui/react-icons";
+import { useMetricsStore } from "@/hooks/useMetricsStore";
 
 const PROGRESS_REPORT_DELAY = 2000;
 
 const SituationProgress = () => {
+  const { report } = useMetricsStore();
   const { progress, fetchProgress } = useSituationStore();
   const { user } = useUserStore();
   const { selectedSituation } = useSituationStore();
   const threadRuntime = useThreadRuntime();
   const messageRef = React.useRef<ThreadMessage | null>(null);
 
-  threadRuntime.subscribe(async () => {
-    const { messages } = threadRuntime.getState();
-    const lastMessage = messages[messages.length - 1];
-    const isLastMessageDone = lastMessage?.status?.type === "complete";
+  useEffect(() => {
+    threadRuntime.subscribe(async () => {
+      const { messages } = threadRuntime.getState();
+      const lastMessage = messages[messages.length - 1];
+      const isLastMessageDone = lastMessage?.status?.type === "complete";
 
-    if (
-      !selectedSituation ||
-      !user ||
-      messageRef.current === lastMessage ||
-      !isLastMessageDone
-    ) {
-      return;
-    }
-
-    messageRef.current = lastMessage;
-
-    const call = async () => {
-      try {
-        await fetchProgress({
-          messages: messages.map(mapToChatMessage),
-          user_id: user.id,
-          situation_id: selectedSituation.id,
-        });
-      } catch (error) {
-        // Error handling is already done in the store
-        console.error("Failed to fetch hint:", error);
+      if (
+        !selectedSituation ||
+        !user ||
+        messageRef.current === lastMessage ||
+        !isLastMessageDone
+      ) {
+        return;
       }
-    };
 
-    debounce(call, PROGRESS_REPORT_DELAY)();
-  });
+      messageRef.current = lastMessage;
+
+      const call = async () => {
+        try {
+          await fetchProgress({
+            messages: messages.map(mapToChatMessage),
+            user_id: user.id,
+            situation_id: selectedSituation.id,
+          });
+        } catch (error) {
+          // Error handling is already done in the store
+          console.error("Failed to fetch hint:", error);
+        }
+      };
+
+      debounce(call, PROGRESS_REPORT_DELAY)();
+    });
+  }, [threadRuntime, selectedSituation, user, fetchProgress]);
 
   const completedGoals = progress.filter((goal) => goal.done).length;
   const totalGoals = progress.length;
   const completionPercentage =
     totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
 
+  if (!selectedSituation || report.length > 0) {
+    return null;
+  }
+
   return (
     <div className="fixed top-4 right-4 z-50">
-      <Popover.Root>
+      <Popover.Root defaultOpen>
         <Popover.Trigger asChild>
           <button
             className="inline-flex size-[45px] items-center justify-center rounded-full bg-white text-violet11 shadow-[0_2px_10px] shadow-blackA4 outline-none hover:bg-violet3 focus:shadow-[0_0_0_2px] focus:shadow-black"
             aria-label="View Progress"
           >
             <div className="relative">
-              <BarChartIcon />
-              <div className="absolute -top-1 -right-1 bg-violet9 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+              <StarIcon />
+              <div className="absolute -top-4 -right-4 bg-violet9 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                 {completedGoals}
               </div>
             </div>
@@ -85,7 +94,7 @@ const SituationProgress = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="w-[300px] rounded bg-white p-5 shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] will-change-[transform,opacity] focus:shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2),0_0_0_2px_theme(colors.violet7)]"
+            className="w-[300px] mr-5 rounded bg-white p-5 shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)] will-change-[transform,opacity] focus:shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2),0_0_0_2px_theme(colors.violet7)]"
             sideOffset={5}
           >
             <div className="flex flex-col gap-2.5">

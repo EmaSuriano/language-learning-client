@@ -3,6 +3,7 @@ import SituationProgress from "@/components/ProgressTracker";
 import SituationSettings from "@/components/SituationSettings";
 import Toggle from "@/components/Toggle";
 import UserSettings from "@/components/UserSettings";
+import EndChatToast from "@/components/EndChatToast";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <UserSettings />
       <SituationSettings />
       <SituationProgress />
+      <EndChatToast />
     </main>
   );
 }
