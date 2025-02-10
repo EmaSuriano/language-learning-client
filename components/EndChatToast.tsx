@@ -15,7 +15,7 @@ import {
 } from "@assistant-ui/react-markdown";
 import classNames from "classnames";
 
-const MESSAGE_LIMIT = 4;
+const MESSAGE_LIMIT = 20;
 
 const defaultComponents: MakeMarkdownTextProps["components"] = {
   h1: ({ node, className, ...props }) => (
@@ -90,9 +90,8 @@ const MessageLimitToast = () => {
   React.useEffect(() => {
     const unsub = threadRuntime.subscribe(() => {
       const { messages } = threadRuntime.getState();
-      if (messages.length >= MESSAGE_LIMIT) {
-        setToastOpen(true);
-      }
+      const hasReachedLimit = messages.length >= MESSAGE_LIMIT;
+      setToastOpen(hasReachedLimit);
     });
 
     return unsub;
