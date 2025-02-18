@@ -3,7 +3,7 @@
 import { useTheme } from "next-themes";
 import nightwind from "nightwind/helper";
 import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
-import { NavigationMenu } from "radix-ui";
+import { Switch } from "radix-ui";
 import { User, UserUpdate, useUserStore } from "@/hooks/useUserStore";
 import { useEffect, useState } from "react";
 
@@ -12,6 +12,7 @@ import { Cross2Icon, GearIcon } from "@radix-ui/react-icons";
 import { useLanguageStore } from "@/hooks/useLanguageStore";
 import { useTTSStore } from "@/hooks/useTTSStore";
 import { formatVoiceTitle } from "@/lib/helpers";
+import { useAppConfigStore } from "@/hooks/useAppConfigStore";
 
 export default function UserSettings() {
   const { user, createUser, fetchUser, updateUser } = useUserStore();
@@ -46,6 +47,7 @@ const UserSettingsDialog = ({
   onUpdate: (user: UserUpdate) => Promise<void>;
 }) => {
   const { languages, fetchLanguages } = useLanguageStore();
+  const { enableAutoPlay, setEnableAutoPlay } = useAppConfigStore();
   const { supportedLanguages, voices, fetchSupportedLanguages, fetchVoices } =
     useTTSStore();
   const [selectedLanguage, setSelectedLanguage] = useState(
@@ -72,6 +74,8 @@ const UserSettingsDialog = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
+    setEnableAutoPlay(Boolean(formData.get("autoplay")));
 
     onUpdate({
       language_level: Number(formData.get("language_level")),
@@ -193,6 +197,20 @@ const UserSettingsDialog = ({
                 name="interests"
                 defaultValue={user.interests.join(", ")}
               />
+            </fieldset>
+
+            <fieldset className="mb-4 flex items-center gap-4">
+              <label className="" htmlFor="autoplay">
+                Enable autoplay
+              </label>
+              <Switch.Root
+                className="relative h-[25px] w-[42px] cursor-default rounded-full bg-blackA6 shadow-[0_2px_10px] shadow-blackA4 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black data-[state=checked]:bg-black"
+                id="autoplay"
+                name="autoplay"
+                defaultChecked={enableAutoPlay}
+              >
+                <Switch.Thumb className="block size-[21px] translate-x-0.5 rounded-full bg-white shadow-[0_2px_2px] shadow-blackA4 transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px]" />
+              </Switch.Root>
             </fieldset>
 
             <div className="mt-6 flex justify-end gap-2">

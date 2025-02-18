@@ -6,6 +6,7 @@ import {
   AssistantActionBar,
   useMessage,
 } from "@assistant-ui/react";
+import { useAppConfigStore } from "@/hooks/useAppConfigStore";
 
 export const MyAssistantMessage = () => {
   return (
@@ -22,10 +23,11 @@ export const MyAssistantMessage = () => {
 
 const AutomaticSpeak = () => {
   const message = useMessage();
+  const { enableAutoPlay } = useAppConfigStore();
   const { speak } = useMessageRuntime();
 
   useEffect(() => {
-    if (message.status?.type === "complete") {
+    if (enableAutoPlay && message.status?.type === "complete") {
       speak();
     }
   }, [message.status, speak]);

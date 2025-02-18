@@ -9,7 +9,6 @@ import {
   type ChatModelAdapter,
 } from "@assistant-ui/react";
 import { ApiSpeechSynthesisAdapter } from "@/components/ApiSpeechSynthesisAdapter";
-import Settings from "@/lib/Settings";
 import { useLocaleStore } from "@/hooks/useLocaleStore";
 import { User, useUserStore } from "@/hooks/useUserStore";
 import { mapToChatMessage } from "@/lib/ChatMessage";
