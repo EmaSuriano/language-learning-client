@@ -1,6 +1,7 @@
 // src/store/useTTSStore.ts
 import { formatVoiceTitle } from "@/lib/helpers";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface TTSState {
   supportedLanguages: string[];
@@ -11,41 +12,46 @@ interface TTSState {
   fetchVoices: (lang: string) => Promise<void>;
 }
 
-export const useTTSStore = create<TTSState>((set) => ({
-  supportedLanguages: [],
-  voices: [],
-  isLoading: false,
-  error: null,
+export const useTTSStore = create<TTSState>()(
+  persist(
+    (set) => ({
+      supportedLanguages: [],
+      voices: [],
+      isLoading: false,
+      error: null,
 
-  fetchSupportedLanguages: async () => {
-    set({ isLoading: true });
-    try {
-      const response = await fetch(
-        `${process.env["NEXT_PUBLIC_ASSISTANT_URL"]}/tts/languages`
-      );
-      const data = await response.json();
-      set({ supportedLanguages: data, isLoading: false });
-    } catch (error) {
-      set({ error: "Failed to fetch TTS languages", isLoading: false });
-    }
-  },
+      fetchSupportedLanguages: async () => {
+        set({ isLoading: true });
+        try {
+          const response = await fetch(
+            `${process.env["NEXT_PUBLIC_ASSISTANT_URL"]}/tts/languages`
+          );
+          const data = await response.json();
+          set({ supportedLanguages: data, isLoading: false });
+        } catch (error) {
+          set({ error: "Failed to fetch TTS languages", isLoading: false });
+        }
+      },
 
-  fetchVoices: async (lang: string) => {
-    set({ isLoading: true });
-    try {
-      const response = await fetch(
-        `${process.env["NEXT_PUBLIC_ASSISTANT_URL"]}/tts/voices/${lang}`
-      );
-      const data: string[] = await response.json();
+      fetchVoices: async (lang: string) => {
+        set({ isLoading: true });
+        try {
+          const response = await fetch(
+            `${process.env["NEXT_PUBLIC_ASSISTANT_URL"]}/tts/voices/${lang}`
+          );
+          const data: string[] = await response.json();
 
-      // sort the voices by alphabetical order
-      data.sort((a, b) =>
-        formatVoiceTitle(a).localeCompare(formatVoiceTitle(b))
-      );
+          // sort the voices by alphabetical order
+          data.sort((a, b) =>
+            formatVoiceTitle(a).localeCompare(formatVoiceTitle(b))
+          );
 
-      set({ voices: data, isLoading: false });
-    } catch (error) {
-      set({ error: "Failed to fetch voices", isLoading: false });
-    }
-  },
-}));
+          set({ voices: data, isLoading: false });
+        } catch (error) {
+          set({ error: "Failed to fetch voices", isLoading: false });
+        }
+      },
+    }),
+    { name: "tts-store" }
+  )
+);

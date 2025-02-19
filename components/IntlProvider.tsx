@@ -25,7 +25,11 @@ export default function IntlProvider({
   }, [locale]);
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider
+      locale={locale}
+      messages={messages}
+      timeZone="Europe/Berlin"
+    >
       {children}
     </NextIntlClientProvider>
   );

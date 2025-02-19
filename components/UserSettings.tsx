@@ -56,8 +56,10 @@ const UserSettingsDialog = ({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    fetchLanguages();
-    fetchSupportedLanguages();
+    if (supportedLanguages.length === 0 || voices.length === 0) {
+      fetchLanguages();
+      fetchSupportedLanguages();
+    }
   }, []);
 
   useEffect(() => {

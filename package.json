@@ -1,24 +1,22 @@
 {
-  "name": "assistant-ui-starter-langgraph",
-  "version": "0.1.0",
+  "name": "language-learning-client",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "knip": "knip"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.7.60",
-    "@assistant-ui/react-langgraph": "^0.2.3",
     "@assistant-ui/react-markdown": "^0.7.11",
-    "@langchain/langgraph-sdk": "^0.0.36",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-toast": "^1.2.6",
     "debounce": "^2.2.0",
-    "js-cookie": "^3.0.5",
     "next": "^15.1.6",
     "next-intl": "^3.26.3",
     "next-themes": "^0.4.4",
@@ -32,13 +30,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@types/js-cookie": "^3.0.6",
     "@types/nightwind": "^1.0.0",
-    "@types/node": "^20.17.16",
+    "@types/node": "^22.13.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "eslint": "^8.57.1",
     "eslint-config-next": "15.1.6",
+    "knip": "^5.44.4",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
