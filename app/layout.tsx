@@ -4,7 +4,8 @@ import { ThemeProvider } from "next-themes";
 
 import "./globals.css";
 import { Suspense } from "react";
-import { MyRuntimeProvider } from "./MyRuntimeProvider";
+import "@radix-ui/themes/styles.css";
+
 import IntlProvider from "@/components/IntlProvider";
 
 const geistSans = Geist({
@@ -28,22 +29,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <MyRuntimeProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          storageKey="nightwind-mode"
+          defaultTheme="system"
         >
-          <IntlProvider>
-            <ThemeProvider
-              attribute="class"
-              storageKey="nightwind-mode"
-              defaultTheme="system" // default "light"
-            >
-              <Suspense>{children}</Suspense>
-            </ThemeProvider>
-          </IntlProvider>
-        </body>
-      </html>
-    </MyRuntimeProvider>
+          <Suspense>{children}</Suspense>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

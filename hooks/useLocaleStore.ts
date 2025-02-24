@@ -1,9 +1,10 @@
+import { useAuthUser } from "./useAuthUser";
 import { useUserStore } from "./useUserStore";
 
 const DEFAULT_LANG = "en";
 
 export const useLocaleStore = () => {
-  const { user } = useUserStore();
+  const { user } = useAuthUser();
   const locale = user?.current_language.code || DEFAULT_LANG;
   const voice = user?.voice_id || null;
 

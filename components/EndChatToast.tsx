@@ -14,6 +14,7 @@ import {
   MakeMarkdownTextProps,
 } from "@assistant-ui/react-markdown";
 import classNames from "classnames";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const MESSAGE_LIMIT = 20;
 
@@ -83,7 +84,7 @@ const MessageLimitToast = () => {
 
   const threadRuntime = useThreadRuntime();
   const { report, isStreaming, fetchReport } = useMetricsStore();
-  const { user } = useUserStore();
+  const { user } = useAuthUser();
   const { selectedSituation } = useSituationStore();
 
   // Check if message count exceeds limit

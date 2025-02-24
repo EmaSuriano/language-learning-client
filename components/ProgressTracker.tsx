@@ -22,13 +22,14 @@ import {
   StarIcon,
 } from "@radix-ui/react-icons";
 import { useMetricsStore } from "@/hooks/useMetricsStore";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const PROGRESS_REPORT_DELAY = 2000;
 
 const SituationProgress = () => {
   const { report } = useMetricsStore();
   const { progress, fetchProgress } = useSituationStore();
-  const { user } = useUserStore();
+  const { user } = useAuthUser();
   const { selectedSituation } = useSituationStore();
   const threadRuntime = useThreadRuntime();
   const messageRef = React.useRef<ThreadMessage | null>(null);

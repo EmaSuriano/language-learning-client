@@ -12,11 +12,12 @@ import { mapToChatMessage } from "@/lib/ChatMessage";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useHintStore } from "@/hooks/useHintStore";
 import { useSituationStore } from "@/hooks/useSituationStore";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const ChatHint = () => {
   const [tries, setTries] = useState(3);
 
-  const { user } = useUserStore();
+  const { user } = useAuthUser();
   const runtime = useComposerRuntime();
   const threadRuntime = useThreadRuntime();
   const { fetchHint, isLoading } = useHintStore();

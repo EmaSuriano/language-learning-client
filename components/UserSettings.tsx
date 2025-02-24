@@ -13,21 +13,10 @@ import { useLanguageStore } from "@/hooks/useLanguageStore";
 import { useTTSStore } from "@/hooks/useTTSStore";
 import { formatVoiceTitle } from "@/lib/helpers";
 import { useAppConfigStore } from "@/hooks/useAppConfigStore";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function UserSettings() {
-  const { user, createUser, fetchUser, updateUser } = useUserStore();
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  if (!user) {
-    return (
-      <button onClick={() => createUser("email@example.com")}>
-        Create User
-      </button>
-    );
-  }
+  const { user, updateUser } = useAuthUser();
 
   const onUpdate = async (update: UserUpdate) =>
     updateUser(update).then(() => {
@@ -47,7 +36,8 @@ const UserSettingsDialog = ({
   onUpdate: (user: UserUpdate) => Promise<void>;
 }) => {
   const { languages, fetchLanguages } = useLanguageStore();
-  const { enableAutoPlay, setEnableAutoPlay } = useAppConfigStore();
+  const { enableAutoPlay, theme, setTheme, setEnableAutoPlay } =
+    useAppConfigStore();
   const { supportedLanguages, voices, fetchSupportedLanguages, fetchVoices } =
     useTTSStore();
   const [selectedLanguage, setSelectedLanguage] = useState(
@@ -78,6 +68,7 @@ const UserSettingsDialog = ({
     const formData = new FormData(e.currentTarget);
 
     setEnableAutoPlay(Boolean(formData.get("autoplay")));
+    setTheme(Boolean(formData.get("theme")) ? "dark" : "light");
 
     onUpdate({
       language_level: Number(formData.get("language_level")),
@@ -210,6 +201,20 @@ const UserSettingsDialog = ({
                 id="autoplay"
                 name="autoplay"
                 defaultChecked={enableAutoPlay}
+              >
+                <Switch.Thumb className="block size-[21px] translate-x-0.5 rounded-full bg-white shadow-[0_2px_2px] shadow-blackA4 transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px]" />
+              </Switch.Root>
+            </fieldset>
+
+            <fieldset className="mb-4 flex items-center gap-4">
+              <label className="" htmlFor="theme">
+                Dark mode
+              </label>
+              <Switch.Root
+                className="relative h-[25px] w-[42px] cursor-default rounded-full bg-blackA6 shadow-[0_2px_10px] shadow-blackA4 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black data-[state=checked]:bg-black"
+                id="theme"
+                name="theme"
+                defaultChecked={theme === "dark"}
               >
                 <Switch.Thumb className="block size-[21px] translate-x-0.5 rounded-full bg-white shadow-[0_2px_2px] shadow-blackA4 transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px]" />
               </Switch.Root>

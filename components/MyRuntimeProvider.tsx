@@ -13,6 +13,7 @@ import { useLocaleStore } from "@/hooks/useLocaleStore";
 import { User, useUserStore } from "@/hooks/useUserStore";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import { Situation, useSituationStore } from "@/hooks/useSituationStore";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 async function* handleStreamResponse(
   response: Response
@@ -128,11 +129,11 @@ export function MyRuntimeProvider({
   children: ReactNode;
 }>) {
   const { locale, voice } = useLocaleStore();
-  const { user } = useUserStore();
+  const { user } = useAuthUser();
   const { selectedSituation } = useSituationStore();
 
   const MyModelAdapter = buildModelAdapter({
-    user: user!,
+    user: user,
     situation: selectedSituation!,
   });
 

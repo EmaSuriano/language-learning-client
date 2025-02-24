@@ -8,6 +8,7 @@ export const SituationSchema = z.object({
   name: z.string(),
   scenario_description: z.string(),
   user_goals: z.array(z.string()),
+  difficulty: z.enum(["easy", "medium", "hard"]),
 });
 
 export const SituationProgressSchema = z.array(
