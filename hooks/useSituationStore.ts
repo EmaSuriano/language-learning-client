@@ -1,7 +1,6 @@
 // src/store/useSituationStore.ts
 import { create } from "zustand";
 import { z } from "zod";
-import { User } from "./useUserStore";
 
 export const SituationSchema = z.object({
   id: z.number(),

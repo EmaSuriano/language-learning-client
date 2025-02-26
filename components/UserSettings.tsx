@@ -1,67 +1,41 @@
 "use client";
 
-import { useTheme } from "next-themes";
-import nightwind from "nightwind/helper";
-import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
 import { Switch } from "radix-ui";
-import { User, UserUpdate, useUserStore } from "@/hooks/useUserStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon, GearIcon } from "@radix-ui/react-icons";
-import { useLanguageStore } from "@/hooks/useLanguageStore";
-import { useTTSStore } from "@/hooks/useTTSStore";
 import { formatVoiceTitle } from "@/lib/helpers";
 import { useAppConfigStore } from "@/hooks/useAppConfigStore";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useLearningSession } from "@/hooks/useLearningSession";
+import { User, UserUpdate } from "@/hooks/useUser";
+import { useLanguages } from "@/hooks/useLanguages";
+import { useTTSVoices } from "@/hooks/useTTS";
+import { useUpdateUser } from "@/hooks/useUser";
+import { redirect } from "next/navigation";
 
 export default function UserSettings() {
-  const { user, updateUser } = useAuthUser();
+  const { mutateAsync: updateUser } = useUpdateUser();
+  const { user, logout } = useLearningSession();
+
+  const { data: languages = [] } = useLanguages();
+  const { enableAutoPlay, theme, setTheme, setEnableAutoPlay } =
+    useAppConfigStore();
+
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    user.current_language
+  );
+  const { data: voices = [] } = useTTSVoices(
+    selectedLanguage.has_tts ? selectedLanguage.code : null
+  );
+  const [open, setOpen] = useState(false);
 
   const onUpdate = async (update: UserUpdate) =>
-    updateUser(update).then(() => {
+    updateUser({ id: user.id.toString(), userData: update }).then(() => {
       if (update.language_code !== user.current_language.code) {
         window.location.reload();
       }
     });
-
-  return <UserSettingsDialog user={user} onUpdate={onUpdate} />;
-}
-
-const UserSettingsDialog = ({
-  user,
-  onUpdate,
-}: {
-  user: User;
-  onUpdate: (user: UserUpdate) => Promise<void>;
-}) => {
-  const { languages, fetchLanguages } = useLanguageStore();
-  const { enableAutoPlay, theme, setTheme, setEnableAutoPlay } =
-    useAppConfigStore();
-  const { supportedLanguages, voices, fetchSupportedLanguages, fetchVoices } =
-    useTTSStore();
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    user.current_language
-  );
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (supportedLanguages.length === 0 || voices.length === 0) {
-      fetchLanguages();
-      fetchSupportedLanguages();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedLanguage.has_tts) {
-      const ttsCode = supportedLanguages.find((l) =>
-        l.startsWith(selectedLanguage.code)
-      );
-      if (ttsCode) {
-        fetchVoices(ttsCode);
-      }
-    }
-  }, [selectedLanguage, languages, supportedLanguages]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -220,6 +194,17 @@ const UserSettingsDialog = ({
               </Switch.Root>
             </fieldset>
 
+            <fieldset className="mb-4 flex items-center gap-4">
+              <button
+                onClick={() => {
+                  redirect("/logout");
+                }}
+                className="h-9 rounded bg-red-100 px-4"
+              >
+                Logout
+              </button>
+            </fieldset>
+
             <div className="mt-6 flex justify-end gap-2">
               <Dialog.Close asChild>
                 <button
@@ -247,4 +232,4 @@ const UserSettingsDialog = ({
       </Dialog.Portal>
     </Dialog.Root>
   );
-};
+}

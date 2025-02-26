@@ -10,10 +10,9 @@ import {
 } from "@assistant-ui/react";
 import { ApiSpeechSynthesisAdapter } from "@/components/ApiSpeechSynthesisAdapter";
 import { useLocaleStore } from "@/hooks/useLocaleStore";
-import { User, useUserStore } from "@/hooks/useUserStore";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import { Situation, useSituationStore } from "@/hooks/useSituationStore";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useLearningSession } from "@/hooks/useLearningSession";
 
 async function* handleStreamResponse(
   response: Response
@@ -129,7 +128,7 @@ export function MyRuntimeProvider({
   children: ReactNode;
 }>) {
   const { locale, voice } = useLocaleStore();
-  const { user } = useAuthUser();
+  const { user } = useLearningSession();
   const { selectedSituation } = useSituationStore();
 
   const MyModelAdapter = buildModelAdapter({

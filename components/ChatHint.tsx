@@ -9,18 +9,17 @@ import {
 
 import { ChatBubbleIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { mapToChatMessage } from "@/lib/ChatMessage";
-import { useUserStore } from "@/hooks/useUserStore";
-import { useHintStore } from "@/hooks/useHintStore";
+import { useHint } from "@/hooks/useHint";
 import { useSituationStore } from "@/hooks/useSituationStore";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useLearningSession } from "@/hooks/useLearningSession";
 
 const ChatHint = () => {
   const [tries, setTries] = useState(3);
 
-  const { user } = useAuthUser();
+  const { user } = useLearningSession();
   const runtime = useComposerRuntime();
   const threadRuntime = useThreadRuntime();
-  const { fetchHint, isLoading } = useHintStore();
+  const { mutateAsync: fetchHint, isPending } = useHint();
   const { selectedSituation } = useSituationStore();
 
   if (!user || !selectedSituation) {
@@ -30,10 +29,12 @@ const ChatHint = () => {
   const onHintClicked: MouseEventHandler = async (e) => {
     e.preventDefault();
 
+    if (tries <= 0) return;
+
     const { messages } = threadRuntime.getState();
 
     try {
-      const hint = await fetchHint({
+      const { hint } = await fetchHint({
         messages: messages.map(mapToChatMessage),
         user_id: user.id,
         situation_id: selectedSituation.id,
@@ -49,11 +50,11 @@ const ChatHint = () => {
 
   return (
     <Composer.Send
-      disabled={isLoading || tries == 0}
+      disabled={isPending || tries == 0}
       onClick={onHintClicked}
       tooltip={`Get hint. Left tries: ${tries}`}
     >
-      {isLoading ? (
+      {isPending ? (
         <UpdateIcon className="w-6 h-6 text-white animate-spin" />
       ) : (
         <ChatBubbleIcon />

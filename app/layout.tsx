@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import "@radix-ui/themes/styles.css";
 
 import IntlProvider from "@/components/IntlProvider";
+import { QueryClientProvider } from "@/components/QueryClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({
           storageKey="nightwind-mode"
           defaultTheme="system"
         >
-          <Suspense>{children}</Suspense>
+          <QueryClientProvider>
+            <Suspense>{children}</Suspense>
+          </QueryClientProvider>
         </ThemeProvider>
       </body>
     </html>

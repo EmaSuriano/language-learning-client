@@ -11,7 +11,6 @@ import {
   useThreadRuntime,
 } from "@assistant-ui/react";
 import { mapToChatMessage } from "@/lib/ChatMessage";
-import { useUserStore } from "@/hooks/useUserStore";
 import debounce from "debounce";
 
 import { Popover } from "radix-ui";
@@ -22,14 +21,14 @@ import {
   StarIcon,
 } from "@radix-ui/react-icons";
 import { useMetricsStore } from "@/hooks/useMetricsStore";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useLearningSession } from "@/hooks/useLearningSession";
 
 const PROGRESS_REPORT_DELAY = 2000;
 
 const SituationProgress = () => {
   const { report } = useMetricsStore();
   const { progress, fetchProgress } = useSituationStore();
-  const { user } = useAuthUser();
+  const { user } = useLearningSession();
   const { selectedSituation } = useSituationStore();
   const threadRuntime = useThreadRuntime();
   const messageRef = React.useRef<ThreadMessage | null>(null);

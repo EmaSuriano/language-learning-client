@@ -1,12 +1,20 @@
-import { UserSession, UserSessionSchema } from "@/schemas/userSession";
 import { useSession } from "react-use-session";
 
+import { z } from "zod";
+
+const SessionSchema = z.object({
+  userId: z.string(),
+  email: z.string().email(),
+});
+
+type Session = z.infer<typeof SessionSchema>;
+
 export const useAuth = () => {
-  const { session, save, clear } = useSession("user-session");
+  const { session: rawSession, save, clear } = useSession("user-session");
 
-  const userSession = session && UserSessionSchema.parse(session);
+  const session = rawSession ? SessionSchema.parse(rawSession) : null;
 
-  const login = (newSession: UserSession) => {
+  const login = (newSession: Session) => {
     save(newSession);
   };
 
@@ -14,10 +22,5 @@ export const useAuth = () => {
     clear();
   };
 
-  return {
-    userSession,
-    login,
-    logout,
-    isAuthenticated: userSession ? !!userSession.userId : false,
-  };
+  return { session, login, logout };
 };

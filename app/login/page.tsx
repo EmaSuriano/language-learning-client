@@ -1,28 +1,28 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useUserStore } from "@/hooks/useUserStore";
+import { useUser } from "@/hooks/useUser";
 import { Box, Button, Container, Theme } from "@radix-ui/themes";
 import { redirect } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const MOCK_USER_ID = "1";
 
 export default function Login() {
-  const { userSession, login } = useAuth();
-  const { error, isLoading, fetchUser } = useUserStore();
+  const { session, login } = useAuth();
+  const [userId, setUserId] = useState(session ? session.userId : null);
+  const { data: user, error, isLoading } = useUser(userId);
 
   const onClick = () => {
-    fetchUser(MOCK_USER_ID).then((user) =>
-      login({ userId: user.id.toString(), email: user.email })
-    );
+    setUserId(MOCK_USER_ID);
   };
 
   useEffect(() => {
-    if (userSession) {
+    if (user) {
+      login({ userId: user.id.toString(), email: user.email });
       redirect("/chat");
     }
-  }, [userSession]);
+  }, [user]);
 
   return (
     <Theme accentColor="blue" grayColor="slate">
@@ -37,7 +37,7 @@ export default function Login() {
 
           {isLoading && <p>Loading...</p>}
 
-          {error && <p>{error}</p>}
+          {error && <p>Error!</p>}
         </Container>
       </Box>
     </Theme>

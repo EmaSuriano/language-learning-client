@@ -1,7 +1,6 @@
 "use client";
 
 import { AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
-import { useUserStore } from "@/hooks/useUserStore";
 import { useEffect, useState } from "react";
 import locales from "@/locales.json";
 import { useLocaleStore } from "@/hooks/useLocaleStore";
