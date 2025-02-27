@@ -14,11 +14,16 @@ import {
 import { Brain, Languages, Mic, MessageSquare } from "lucide-react";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
+import { useTheme } from "next-themes";
 
 const LandingPage = () => {
+  const { theme } = useTheme();
+
+  console.log("asdasd", theme);
+
   return (
-    <Theme accentColor="blue" grayColor="slate">
+    <Theme accentColor="blue" grayColor="slate" appearance="dark">
       <Box className="min-h-screen bg-[#0A0A0A]">
         <Container size="4" p="6">
           {/* Hero Section */}
@@ -35,8 +40,12 @@ const LandingPage = () => {
               Adaptive learning system that combines advanced AI with
               Reinforcement Learning techniques for a personalized experience.
             </Text>
-            <Button size="4" variant="solid" onClick={() => redirect("/login")}>
-              Start Learning
+            <Button
+              size="4"
+              variant="solid"
+              onClick={() => redirect("/login", RedirectType.push)}
+            >
+              Get Started
             </Button>
           </Flex>
 

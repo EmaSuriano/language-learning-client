@@ -10,17 +10,15 @@ import {
 import { ChatBubbleIcon, UpdateIcon } from "@radix-ui/react-icons";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import { useHint } from "@/hooks/useHint";
-import { useSituationStore } from "@/hooks/useSituationStore";
 import { useLearningSession } from "@/hooks/useLearningSession";
 
 const ChatHint = () => {
   const [tries, setTries] = useState(3);
 
-  const { user } = useLearningSession();
+  const { user, selectedSituation } = useLearningSession();
   const runtime = useComposerRuntime();
   const threadRuntime = useThreadRuntime();
   const { mutateAsync: fetchHint, isPending } = useHint();
-  const { selectedSituation } = useSituationStore();
 
   if (!user || !selectedSituation) {
     return null;

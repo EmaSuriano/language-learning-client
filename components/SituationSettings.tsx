@@ -1,20 +1,16 @@
 "use client";
 
 import { Dialog } from "radix-ui";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { useSituationStore } from "@/hooks/useSituationStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { capitalize } from "@/lib/helpers";
+import { useSituations } from "@/hooks/useSituations";
+import { useLearningSession } from "@/hooks/useLearningSession";
 
 const SituationSettings = () => {
-  const { situations, selectedSituation, selectSituation, fetchSituations } =
-    useSituationStore();
+  const { selectedSituation, setSelectedSituation } = useLearningSession();
   const [currentSituation, setCurrentSituation] = useState(selectedSituation);
   const [open, setOpen] = useState(selectedSituation === null);
-
-  useEffect(() => {
-    fetchSituations();
-  }, [fetchSituations]);
+  const { data: situations = [] } = useSituations();
 
   const onOpenChange = (open: boolean) => {
     if (open === true) {
@@ -31,7 +27,7 @@ const SituationSettings = () => {
       return;
     }
 
-    selectSituation(currentSituation.id);
+    setSelectedSituation(currentSituation);
     setOpen(false);
   };
 

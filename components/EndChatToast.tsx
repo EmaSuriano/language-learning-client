@@ -4,7 +4,6 @@ import * as React from "react";
 import * as Toast from "@radix-ui/react-toast";
 import { useThreadRuntime } from "@assistant-ui/react";
 import { useMetricsStore } from "@/hooks/useMetricsStore";
-import { useSituationStore } from "@/hooks/useSituationStore";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import { Dialog } from "radix-ui";
 import ReactMarkdown from "react-markdown";
@@ -15,7 +14,7 @@ import {
 import classNames from "classnames";
 import { useLearningSession } from "@/hooks/useLearningSession";
 
-const MESSAGE_LIMIT = 20;
+const MESSAGE_LIMIT = 10;
 
 const defaultComponents: MakeMarkdownTextProps["components"] = {
   h1: ({ node, className, ...props }) => (
@@ -83,8 +82,7 @@ const MessageLimitToast = () => {
 
   const threadRuntime = useThreadRuntime();
   const { report, isStreaming, fetchReport } = useMetricsStore();
-  const { user } = useLearningSession();
-  const { selectedSituation } = useSituationStore();
+  const { user, selectedSituation } = useLearningSession();
 
   // Check if message count exceeds limit
   React.useEffect(() => {

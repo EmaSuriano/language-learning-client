@@ -3,6 +3,7 @@ import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { Thread } from "@assistant-ui/react";
 
 import { MyComposer } from "./MyComposer";
+import { MyThreadWelcome } from "./MyThreadWelcome";
 import { MyAssistantMessage } from "./MyAssistanceMessage";
 import { useTranslations } from "next-intl";
 
@@ -11,11 +12,6 @@ export function MyAssistant() {
 
   return (
     <Thread
-      strings={{
-        welcome: {
-          message: t("welcome"),
-        },
-      }}
       welcome={{
         suggestions: [
           { prompt: t("hello") },
@@ -37,6 +33,7 @@ export function MyAssistant() {
       components={{
         Composer: MyComposer,
         AssistantMessage: MyAssistantMessage,
+        ThreadWelcome: MyThreadWelcome,
       }}
     />
   );

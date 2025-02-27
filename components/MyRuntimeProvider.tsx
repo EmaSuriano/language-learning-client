@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
   AssistantRuntimeProvider,
   ChatModelRunResult,
-  ThreadMessage,
   useLocalRuntime,
   type ChatModelAdapter,
 } from "@assistant-ui/react";
 import { ApiSpeechSynthesisAdapter } from "@/components/ApiSpeechSynthesisAdapter";
 import { useLocaleStore } from "@/hooks/useLocaleStore";
 import { mapToChatMessage } from "@/lib/ChatMessage";
-import { Situation, useSituationStore } from "@/hooks/useSituationStore";
 import { useLearningSession } from "@/hooks/useLearningSession";
+import { User } from "@/hooks/useUser";
+import { Situation } from "@/hooks/useSituations";
 
 async function* handleStreamResponse(
   response: Response
@@ -128,8 +128,7 @@ export function MyRuntimeProvider({
   children: ReactNode;
 }>) {
   const { locale, voice } = useLocaleStore();
-  const { user } = useLearningSession();
-  const { selectedSituation } = useSituationStore();
+  const { user, selectedSituation } = useLearningSession();
 
   const MyModelAdapter = buildModelAdapter({
     user: user,

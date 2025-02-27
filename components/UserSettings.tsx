@@ -95,7 +95,6 @@ export default function UserSettings() {
                   className="h-9 w-full rounded border px-2"
                   id="language_code"
                   name="language_code"
-                  defaultValue={user.current_language.code}
                   value={selectedLanguage.code}
                   onChange={(e) =>
                     setSelectedLanguage(

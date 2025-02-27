@@ -1,35 +1,41 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import {
-  SituationProgressRequest,
-  useSituationStore,
-} from "@/hooks/useSituationStore";
-import {
-  ThreadMessage,
-  useMessage,
-  useThreadRuntime,
-} from "@assistant-ui/react";
+import React, { useEffect } from "react";
+import { ThreadMessage, useThreadRuntime } from "@assistant-ui/react";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import debounce from "debounce";
 
 import { Popover } from "radix-ui";
-import {
-  BarChartIcon,
-  CheckCircledIcon,
-  CircleIcon,
-  StarIcon,
-} from "@radix-ui/react-icons";
+import { CheckCircledIcon, CircleIcon, StarIcon } from "@radix-ui/react-icons";
 import { useMetricsStore } from "@/hooks/useMetricsStore";
 import { useLearningSession } from "@/hooks/useLearningSession";
+import { Situation, useSituationProgress } from "@/hooks/useSituations";
+import { User } from "@/hooks/useUser";
 
 const PROGRESS_REPORT_DELAY = 2000;
 
-const SituationProgress = () => {
+export const ProgressTracker = () => {
+  const { user, selectedSituation } = useLearningSession();
+
+  if (!selectedSituation) {
+    return null;
+  }
+
+  return (
+    <SituationProgress selectedSituation={selectedSituation} user={user} />
+  );
+};
+
+const SituationProgress = ({
+  selectedSituation,
+  user,
+}: {
+  user: User;
+  selectedSituation: Situation;
+}) => {
   const { report } = useMetricsStore();
-  const { progress, fetchProgress } = useSituationStore();
-  const { user } = useLearningSession();
-  const { selectedSituation } = useSituationStore();
+  const { data: progress = [], mutateAsync: fetchProgress } =
+    useSituationProgress();
   const threadRuntime = useThreadRuntime();
   const messageRef = React.useRef<ThreadMessage | null>(null);
 
@@ -39,12 +45,7 @@ const SituationProgress = () => {
       const lastMessage = messages[messages.length - 1];
       const isLastMessageDone = lastMessage?.status?.type === "complete";
 
-      if (
-        !selectedSituation ||
-        !user ||
-        messageRef.current === lastMessage ||
-        !isLastMessageDone
-      ) {
+      if (messageRef.current === lastMessage || !isLastMessageDone) {
         return;
       }
 
@@ -72,13 +73,13 @@ const SituationProgress = () => {
   const completionPercentage =
     totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
 
-  if (!selectedSituation || report.length > 0) {
+  if (messageRef.current === null || report.length > 0) {
     return null;
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <Popover.Root defaultOpen>
+    <div className="fixed top-4 right-8 z-50">
+      <Popover.Root>
         <Popover.Trigger asChild>
           <button
             className="inline-flex size-[45px] items-center justify-center rounded-full bg-white text-violet11 shadow-[0_2px_10px] shadow-blackA4 outline-none hover:bg-violet3 focus:shadow-[0_0_0_2px] focus:shadow-black"
@@ -107,16 +108,8 @@ const SituationProgress = () => {
                 </span>
               </div>
 
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                <div
-                  className="bg-violet9 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${completionPercentage}%` }}
-                />
-              </div>
-
               {/* Goals List */}
-              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
                 {progress.map((goal, index) => (
                   <div key={index} className="flex items-start gap-2 py-1">
                     {goal.done ? (

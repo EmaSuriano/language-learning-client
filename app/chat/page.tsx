@@ -1,7 +1,7 @@
 "use client";
 
 import { MyAssistant } from "@/components/MyAssistant";
-import SituationProgress from "@/components/ProgressTracker";
+import { ProgressTracker } from "@/components/ProgressTracker";
 import SituationSettings from "@/components/SituationSettings";
 import UserSettings from "@/components/UserSettings";
 import EndChatToast from "@/components/EndChatToast";
@@ -18,7 +18,7 @@ export default function Chat() {
             <MyAssistant />
             <UserSettings />
             <SituationSettings />
-            <SituationProgress />
+            <ProgressTracker />
             <EndChatToast />
           </main>
         </MyRuntimeProvider>
