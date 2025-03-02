@@ -128,18 +128,13 @@ export function MyRuntimeProvider({
   children: ReactNode;
 }>) {
   const { locale, voice } = useLocaleStore();
-  const { user, selectedSituation } = useLearningSession();
+  const { user, selectedSituation: situation } = useLearningSession();
 
-  const MyModelAdapter = buildModelAdapter({
-    user: user,
-    situation: selectedSituation!,
-  });
+  const MyModelAdapter = buildModelAdapter({ user, situation });
 
-  const runtime = useLocalRuntime(MyModelAdapter, {
-    adapters: {
-      speech: new ApiSpeechSynthesisAdapter({ language: locale, voice }),
-    },
-  });
+  const speech = new ApiSpeechSynthesisAdapter({ language: locale, voice });
+
+  const runtime = useLocalRuntime(MyModelAdapter, { adapters: { speech } });
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

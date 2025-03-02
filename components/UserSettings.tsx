@@ -7,16 +7,20 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon, GearIcon } from "@radix-ui/react-icons";
 import { formatVoiceTitle } from "@/lib/helpers";
 import { useAppConfigStore } from "@/hooks/useAppConfigStore";
-import { useLearningSession } from "@/hooks/useLearningSession";
-import { User, UserUpdate } from "@/hooks/useUser";
+import {
+  useLearningSession,
+  useSelectedSituationStore,
+} from "@/hooks/useLearningSession";
+import { UserUpdate } from "@/hooks/useUser";
 import { useLanguages } from "@/hooks/useLanguages";
 import { useTTSVoices } from "@/hooks/useTTS";
 import { useUpdateUser } from "@/hooks/useUser";
 import { redirect } from "next/navigation";
 
 export default function UserSettings() {
+  const { setSelectedSituation } = useSelectedSituationStore();
   const { mutateAsync: updateUser } = useUpdateUser();
-  const { user, logout } = useLearningSession();
+  const { user } = useLearningSession();
 
   const { data: languages = [] } = useLanguages();
   const { enableAutoPlay, theme, setTheme, setEnableAutoPlay } =
@@ -33,7 +37,7 @@ export default function UserSettings() {
   const onUpdate = async (update: UserUpdate) =>
     updateUser({ id: user.id.toString(), userData: update }).then(() => {
       if (update.language_code !== user.current_language.code) {
-        window.location.reload();
+        setSelectedSituation(null);
       }
     });
 

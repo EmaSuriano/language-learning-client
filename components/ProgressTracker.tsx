@@ -1,81 +1,71 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { ThreadMessage, useThreadRuntime } from "@assistant-ui/react";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import debounce from "debounce";
 
-import { Popover } from "radix-ui";
-import { CheckCircledIcon, CircleIcon, StarIcon } from "@radix-ui/react-icons";
-import { useMetricsStore } from "@/hooks/useMetricsStore";
+import { Popover, Toast } from "radix-ui";
+import { StarIcon } from "@radix-ui/react-icons";
 import { useLearningSession } from "@/hooks/useLearningSession";
-import { Situation, useSituationProgress } from "@/hooks/useSituations";
-import { User } from "@/hooks/useUser";
+import {
+  Situation,
+  SituationProgress,
+  useSituationProgress,
+} from "@/hooks/useSituations";
+import { useChatMessages } from "@/hooks/useChatMessages";
+import { ReportDialog } from "./ReportDialog";
+import { SituationProgressGoalList } from "./SituationProgressGoalList";
 
 const PROGRESS_REPORT_DELAY = 2000;
 
 export const ProgressTracker = () => {
   const { user, selectedSituation } = useLearningSession();
 
-  if (!selectedSituation) {
+  const [reportOpen, setReportOpen] = React.useState(false);
+  const messages = useChatMessages();
+  const { data: progress, refetch } = useSituationProgress({
+    messages: messages.map(mapToChatMessage),
+    user_id: user.id,
+    situation_id: selectedSituation.id,
+  });
+
+  useEffect(() => {
+    // We start checking the report only after the first message
+    if (messages.length > 1) {
+      debounce(refetch, PROGRESS_REPORT_DELAY)();
+    }
+  }, [messages, refetch]);
+
+  if (!progress) {
     return null;
+  }
+
+  if (reportOpen) {
+    return <ReportDialog progress={progress} />;
   }
 
   return (
-    <SituationProgress selectedSituation={selectedSituation} user={user} />
+    <>
+      <GoalsOverview situation={selectedSituation} goals={progress.goals} />
+      <EndChatToast
+        open={progress.conversation_over}
+        onResultClick={() => setReportOpen(true)}
+      />
+    </>
   );
 };
 
-const SituationProgress = ({
-  selectedSituation,
-  user,
+const GoalsOverview = ({
+  situation,
+  goals,
 }: {
-  user: User;
-  selectedSituation: Situation;
+  situation: Situation;
+  goals: SituationProgress["goals"];
 }) => {
-  const { report } = useMetricsStore();
-  const { data: progress = [], mutateAsync: fetchProgress } =
-    useSituationProgress();
-  const threadRuntime = useThreadRuntime();
-  const messageRef = React.useRef<ThreadMessage | null>(null);
-
-  useEffect(() => {
-    threadRuntime.subscribe(async () => {
-      const { messages } = threadRuntime.getState();
-      const lastMessage = messages[messages.length - 1];
-      const isLastMessageDone = lastMessage?.status?.type === "complete";
-
-      if (messageRef.current === lastMessage || !isLastMessageDone) {
-        return;
-      }
-
-      messageRef.current = lastMessage;
-
-      const call = async () => {
-        try {
-          await fetchProgress({
-            messages: messages.map(mapToChatMessage),
-            user_id: user.id,
-            situation_id: selectedSituation.id,
-          });
-        } catch (error) {
-          // Error handling is already done in the store
-          console.error("Failed to fetch hint:", error);
-        }
-      };
-
-      debounce(call, PROGRESS_REPORT_DELAY)();
-    });
-  }, [threadRuntime, selectedSituation, user, fetchProgress]);
-
-  const completedGoals = progress.filter((goal) => goal.done).length;
-  const totalGoals = progress.length;
+  const completedGoals = goals.filter((goal) => goal.done).length;
+  const totalGoals = goals.length;
   const completionPercentage =
     totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
-
-  if (messageRef.current === null || report.length > 0) {
-    return null;
-  }
 
   return (
     <div className="fixed top-4 right-8 z-50">
@@ -101,32 +91,14 @@ const SituationProgress = ({
             <div className="flex flex-col gap-2.5">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-[15px] font-medium leading-[19px] text-mauve12">
-                  Progress - {selectedSituation?.name}
+                  Progress - {situation.name}
                 </p>
                 <span className="text-sm text-violet11 font-medium">
                   {completionPercentage}%
                 </span>
               </div>
 
-              {/* Goals List */}
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {progress.map((goal, index) => (
-                  <div key={index} className="flex items-start gap-2 py-1">
-                    {goal.done ? (
-                      <CheckCircledIcon className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <CircleIcon className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                    )}
-                    <span
-                      className={`text-[13px] ${
-                        goal.done ? "text-gray-700" : "text-gray-500"
-                      }`}
-                    >
-                      {goal.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <SituationProgressGoalList goals={goals} />
 
               {/* Summary */}
               <div className="mt-4 pt-4 border-t border-gray-200">
@@ -142,4 +114,40 @@ const SituationProgress = ({
   );
 };
 
-export default SituationProgress;
+const EndChatToast = ({
+  open,
+  onResultClick,
+}: {
+  open: boolean;
+  onResultClick: VoidFunction;
+}) => {
+  return (
+    <Toast.Provider swipeDirection="up" duration={Infinity}>
+      <Toast.Root
+        className="grid grid-cols-[auto_max-content] items-center gap-x-[15px] rounded-md bg-white p-[15px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] [grid-template-areas:_'title_action'_'description_action'] data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[state=closed]:animate-hide data-[state=open]:animate-slideIn data-[swipe=end]:animate-swipeOut data-[swipe=cancel]:transition-[transform_200ms_ease-out]"
+        open={open}
+        duration={Infinity}
+      >
+        <Toast.Title className="mb-[5px] text-[15px] font-medium text-slate12 [grid-area:_title]">
+          What a wonderful conversation!
+        </Toast.Title>
+        <Toast.Description className="m-0 text-[13px] leading-[1.3] text-slate11 [grid-area:_description]">
+          Click here to get your results and end the chat.
+        </Toast.Description>
+        <Toast.Action
+          className="[grid-area:_action]"
+          asChild
+          altText="Dismiss notification"
+        >
+          <button
+            onClick={onResultClick}
+            className="inline-flex h-[25px] items-center justify-center rounded bg-green2 px-2.5 text-xs font-medium leading-[25px] text-green11 shadow-[inset_0_0_0_1px] shadow-green7 hover:shadow-[inset_0_0_0_1px] hover:shadow-green8 focus:shadow-[0_0_0_2px] focus:shadow-green8"
+          >
+            Results
+          </button>
+        </Toast.Action>
+      </Toast.Root>
+      <Toast.Viewport className="fixed top-4 left-1/2 -translate-x-1/2 z-[2147483647] m-0 flex w-[390px] max-w-[100vw] list-none flex-col gap-2.5 p-[var(--viewport-padding)] outline-none [--viewport-padding:_25px]" />
+    </Toast.Provider>
+  );
+};

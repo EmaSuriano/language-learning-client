@@ -8,22 +8,34 @@ import { create } from "zustand";
 
 type BaseLearningSession = {
   selectedSituation: Situation | null;
-  setSelectedSituation: (selectedSituation: Situation) => void;
+  setSelectedSituation: (selectedSituation: Situation | null) => void;
 };
 
-const useBaseAppConfigStore = create<BaseLearningSession>()((set, get) => ({
-  selectedSituation: null,
-  setSelectedSituation: (selectedSituation) => set({ selectedSituation }),
-}));
+export const useSelectedSituationStore = create<BaseLearningSession>()(
+  (set, get) => ({
+    selectedSituation: null,
+    setSelectedSituation: (selectedSituation) => set({ selectedSituation }),
+  })
+);
+
+export const useAuthUser = () => {
+  const { session } = useAuth();
+  const { data: user } = useUser(session ? session.userId : null);
+
+  return { user };
+};
 
 export const useLearningSession = () => {
-  const { session, logout } = useAuth();
-  const { data: user } = useUser(session ? session.userId : null);
-  const { selectedSituation, setSelectedSituation } = useBaseAppConfigStore();
+  const { user } = useAuthUser();
+  const { selectedSituation } = useSelectedSituationStore();
 
-  if (!session || !user) {
+  if (!user) {
     throw new Error("Authenticated user requested but not found");
   }
 
-  return { user, logout, selectedSituation, setSelectedSituation };
+  if (!selectedSituation) {
+    throw new Error("Selected situation requested but not found");
+  }
+
+  return { user, selectedSituation };
 };

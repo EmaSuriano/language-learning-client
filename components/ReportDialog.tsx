@@ -1,20 +1,18 @@
 "use client";
 
 import * as React from "react";
-import * as Toast from "@radix-ui/react-toast";
-import { useThreadRuntime } from "@assistant-ui/react";
 import { useMetricsStore } from "@/hooks/useMetricsStore";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import { Dialog } from "radix-ui";
 import ReactMarkdown from "react-markdown";
-import {
-  CodeHeader,
-  MakeMarkdownTextProps,
-} from "@assistant-ui/react-markdown";
+import { MakeMarkdownTextProps } from "@assistant-ui/react-markdown";
 import classNames from "classnames";
 import { useLearningSession } from "@/hooks/useLearningSession";
-
-const MESSAGE_LIMIT = 10;
+import { useChatMessages } from "@/hooks/useChatMessages";
+import { Situation, SituationProgress } from "@/hooks/useSituations";
+import { SituationProgressGoalList } from "./SituationProgressGoalList";
+import { useEvaluatorOverview } from "@/hooks/useEvaluator";
+import { EvaluatorOverviewChart } from "./EvaluatorOverviewChart";
 
 const defaultComponents: MakeMarkdownTextProps["components"] = {
   h1: ({ node, className, ...props }) => (
@@ -76,69 +74,41 @@ const defaultComponents: MakeMarkdownTextProps["components"] = {
   ),
 };
 
-const MessageLimitToast = () => {
-  const [toastOpen, setToastOpen] = React.useState(false);
-  const [reportOpen, setReportOpen] = React.useState(false);
-
-  const threadRuntime = useThreadRuntime();
-  const { report, isStreaming, fetchReport } = useMetricsStore();
+export const ReportDialog = ({ progress }: { progress: SituationProgress }) => {
+  // const { report, isStreaming, fetchReport } = useMetricsStore();
   const { user, selectedSituation } = useLearningSession();
+  const messages = useChatMessages();
+  const {
+    data: overview,
+    isPending,
+    isError,
+    mutateAsync: fetchOverview,
+  } = useEvaluatorOverview();
 
-  // Check if message count exceeds limit
-  React.useEffect(() => {
-    const unsub = threadRuntime.subscribe(() => {
-      const { messages } = threadRuntime.getState();
-      const hasReachedLimit = messages.length >= MESSAGE_LIMIT;
-      setToastOpen(hasReachedLimit);
-    });
+  // React.useEffect(() => {
+  //   if (open) {
+  //     fetchReport({
+  //       messages: messages.map(mapToChatMessage),
+  //       user_id: user.id,
+  //       situation_id: situation.id,
+  //     });
+  //   }
+  // }, [open]);
 
-    return unsub;
-  }, [threadRuntime]);
-
-  const onMetricsClick = async () => {
-    const { messages } = threadRuntime.getState();
-    if (!user || !selectedSituation) return;
-
-    fetchReport({
+  const getOverview = () =>
+    fetchOverview({
       messages: messages.map(mapToChatMessage),
       user_id: user.id,
       situation_id: selectedSituation.id,
-    }).then(() => {
-      setReportOpen(true);
     });
-  };
+
+  React.useEffect(() => {
+    getOverview();
+  }, []);
 
   return (
     <>
-      <Toast.Provider swipeDirection="up" duration={Infinity}>
-        <Toast.Root
-          className="grid grid-cols-[auto_max-content] items-center gap-x-[15px] rounded-md bg-white p-[15px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] [grid-template-areas:_'title_action'_'description_action'] data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[state=closed]:animate-hide data-[state=open]:animate-slideIn data-[swipe=end]:animate-swipeOut data-[swipe=cancel]:transition-[transform_200ms_ease-out]"
-          open={toastOpen && !reportOpen}
-          duration={Infinity}
-        >
-          <Toast.Title className="mb-[5px] text-[15px] font-medium text-slate12 [grid-area:_title]">
-            What a wonderful conversation!
-          </Toast.Title>
-          <Toast.Description className="m-0 text-[13px] leading-[1.3] text-slate11 [grid-area:_description]">
-            Click here to get your results and end the chat.
-          </Toast.Description>
-          <Toast.Action
-            className="[grid-area:_action]"
-            asChild
-            altText="Dismiss notification"
-          >
-            <button
-              onClick={onMetricsClick}
-              className="inline-flex h-[25px] items-center justify-center rounded bg-green2 px-2.5 text-xs font-medium leading-[25px] text-green11 shadow-[inset_0_0_0_1px] shadow-green7 hover:shadow-[inset_0_0_0_1px] hover:shadow-green8 focus:shadow-[0_0_0_2px] focus:shadow-green8"
-            >
-              Results
-            </button>
-          </Toast.Action>
-        </Toast.Root>
-        <Toast.Viewport className="fixed top-4 left-1/2 -translate-x-1/2 z-[2147483647] m-0 flex w-[390px] max-w-[100vw] list-none flex-col gap-2.5 p-[var(--viewport-padding)] outline-none [--viewport-padding:_25px]" />
-      </Toast.Provider>
-
-      <Dialog.Root open={reportOpen} modal>
+      <Dialog.Root open modal>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <Dialog.Content
@@ -146,18 +116,56 @@ const MessageLimitToast = () => {
             onPointerDownOutside={(e) => e.preventDefault()}
             onEscapeKeyDown={(e) => e.preventDefault()}
           >
+            <Dialog.Title className="my-2 text-xl font-medium text-black">
+              Chat overview
+            </Dialog.Title>
+
+            <Dialog.Description className="mb-8 text-lg font-medium text-black">
+              Scenario: {selectedSituation.name}
+            </Dialog.Description>
+
+            <h3 className="text-md mb-2 font-medium leading-[19px] text-black">
+              Goals summary
+            </h3>
+
+            <SituationProgressGoalList goals={progress.goals} />
+
+            <h3 className="text-md mt-6 font-medium leading-[19px] text-black">
+              Overview summary
+            </h3>
+
             <div className="overflow-y-auto max-h-[60vh] prose prose-sm">
+              {isPending
+                ? "Loading ..."
+                : isError
+                ? "Error"
+                : overview && <EvaluatorOverviewChart data={overview} />}
+            </div>
+
+            <h3 className="text-md mt-6 font-medium leading-[19px] text-black">
+              Feedback report
+            </h3>
+
+            {/* <div className="overflow-y-auto max-h-[60vh] prose prose-sm">
               <ReactMarkdown components={defaultComponents}>
                 {report}
               </ReactMarkdown>
-            </div>
+            </div> */}
 
             <div className="mt-6 flex justify-end gap-4">
               <button
+                onClick={getOverview}
+                className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+              >
+                Try again
+              </button>
+
+              <button
+                disabled={isPending}
                 onClick={() => window.location.reload()}
                 className="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
-                {isStreaming ? "Loading..." : "Start New Conversation"}
+                Start New Conversation
               </button>
             </div>
           </Dialog.Content>
@@ -166,5 +174,3 @@ const MessageLimitToast = () => {
     </>
   );
 };
-
-export default MessageLimitToast;

@@ -20,10 +20,6 @@ const ChatHint = () => {
   const threadRuntime = useThreadRuntime();
   const { mutateAsync: fetchHint, isPending } = useHint();
 
-  if (!user || !selectedSituation) {
-    return null;
-  }
-
   const onHintClicked: MouseEventHandler = async (e) => {
     e.preventDefault();
 

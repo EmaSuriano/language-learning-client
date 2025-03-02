@@ -11,9 +11,10 @@ export const SituationSchema = z.object({
   difficulty: z.enum(["easy", "medium", "hard"]),
 });
 
-export const SituationProgressSchema = z.array(
-  z.object({ name: z.string(), done: z.boolean() })
-);
+export const SituationProgressSchema = z.object({
+  conversation_over: z.boolean(),
+  goals: z.array(z.object({ name: z.string(), done: z.boolean() })),
+});
 
 const SituationProgressRequestSchema = z.object({
   messages: z.array(
@@ -80,11 +81,11 @@ export const useSituation = (situationId: string | null) => {
 // };
 
 // Fetch progress from API
-export const useSituationProgress = () => {
-  return useMutation<SituationProgress, Error, SituationProgressRequest>({
-    mutationFn: async (params) => {
-      const validatedParams = SituationProgressRequestSchema.parse(params);
-      return getSituationProgress(validatedParams);
-    },
+export const useSituationProgress = (params: SituationProgressRequest) => {
+  return useQuery<SituationProgress>({
+    queryKey: ["situation-progress", params.situation_id],
+    queryFn: () => getSituationProgress(params),
+    enabled: params.messages.length > 0,
+    gcTime: 0,
   });
 };
