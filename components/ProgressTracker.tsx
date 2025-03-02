@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { mapToChatMessage } from "@/lib/ChatMessage";
 import debounce from "debounce";
 
@@ -16,39 +16,72 @@ import { useChatMessages } from "@/hooks/useChatMessages";
 import { ReportDialog } from "./ReportDialog";
 import { SituationProgressGoalList } from "./SituationProgressGoalList";
 
-const PROGRESS_REPORT_DELAY = 2000;
+const PROGRESS_REPORT_DELAY = 500;
 
 export const ProgressTracker = () => {
   const { user, selectedSituation } = useLearningSession();
 
   const [reportOpen, setReportOpen] = React.useState(false);
   const messages = useChatMessages();
-  const { data: progress, refetch } = useSituationProgress({
-    messages: messages.map(mapToChatMessage),
-    user_id: user.id,
-    situation_id: selectedSituation.id,
-  });
+  const { data: progress, mutateAsync, isPending } = useSituationProgress();
+  // Store the latest valid progress data in a ref to persist between requests
+  const progressRef = React.useRef<SituationProgress | null>(null);
 
-  useEffect(() => {
-    // We start checking the report only after the first message
-    if (messages.length > 1) {
-      debounce(refetch, PROGRESS_REPORT_DELAY)();
+  // Update the ref whenever we get new valid progress data
+  React.useEffect(() => {
+    if (progress) {
+      progressRef.current = progress;
     }
-  }, [messages, refetch]);
+  }, [progress]);
 
-  if (!progress) {
+  const getProgress = useCallback(
+    () =>
+      mutateAsync({
+        messages: messages.map(mapToChatMessage),
+        user_id: user.id,
+        situation_id: selectedSituation.id,
+      }),
+    [messages, mutateAsync, user.id, selectedSituation.id]
+  );
+
+  const debouncedGetProgress = useCallback(
+    debounce(() => {
+      getProgress();
+    }, PROGRESS_REPORT_DELAY),
+    [getProgress]
+  );
+
+  // Step 3: Use the debounced function properly in useEffect
+  useEffect(() => {
+    if (messages.length > 6) {
+      debouncedGetProgress();
+    }
+
+    // Step 4: Proper cleanup
+    return () => {
+      debouncedGetProgress.clear();
+    };
+  }, [messages.length, debouncedGetProgress]);
+
+  const currentProgress = progress || progressRef.current;
+
+  if (!currentProgress) {
     return null;
   }
 
   if (reportOpen) {
-    return <ReportDialog progress={progress} />;
+    return <ReportDialog progress={currentProgress} messages={[...messages]} />;
   }
 
   return (
     <>
-      <GoalsOverview situation={selectedSituation} goals={progress.goals} />
+      <GoalsOverview
+        situation={selectedSituation}
+        goals={currentProgress.goals}
+        isPending={isPending}
+      />
       <EndChatToast
-        open={progress.conversation_over}
+        open={currentProgress.conversation_over}
         onResultClick={() => setReportOpen(true)}
       />
     </>
@@ -58,9 +91,11 @@ export const ProgressTracker = () => {
 const GoalsOverview = ({
   situation,
   goals,
+  isPending,
 }: {
   situation: Situation;
   goals: SituationProgress["goals"];
+  isPending: boolean;
 }) => {
   const completedGoals = goals.filter((goal) => goal.done).length;
   const totalGoals = goals.length;
@@ -76,7 +111,11 @@ const GoalsOverview = ({
             aria-label="View Progress"
           >
             <div className="relative">
-              <StarIcon />
+              {isPending ? (
+                <div className="h-4 w-4 rounded-full border-2 border-violet9 border-t-transparent animate-spin" />
+              ) : (
+                <StarIcon />
+              )}
               <div className="absolute -top-4 -right-4 bg-violet9 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                 {completedGoals}
               </div>

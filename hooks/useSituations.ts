@@ -32,7 +32,7 @@ export type Situation = z.infer<typeof SituationSchema>;
 
 const getSituations = () =>
   api
-    .get("/situations")
+    .get("/situations/")
     .then((res) => z.array(SituationSchema).parse(res.data));
 
 const getSituationById = (id: string) =>
@@ -63,29 +63,9 @@ export const useSituation = (situationId: string | null) => {
   });
 };
 
-// Hook for situation progress
-// export const useSituationProgress = (situationId: number | null) => {
-//   const { data: situation } = useSituation(situationId);
-//   const [progress, setProgress] = useState<SituationProgress>(
-//     situation?.user_goals.map((name) => ({ name, done: false })) || []
-//   );
-
-//   // Update progress when situation changes
-//   useEffect(() => {
-//     if (situation) {
-//       setProgress(situation.user_goals.map((name) => ({ name, done: false })));
-//     }
-//   }, [situation]);
-
-//   return { progress, setProgress };
-// };
-
 // Fetch progress from API
-export const useSituationProgress = (params: SituationProgressRequest) => {
-  return useQuery<SituationProgress>({
-    queryKey: ["situation-progress", params.situation_id],
-    queryFn: () => getSituationProgress(params),
-    enabled: params.messages.length > 0,
-    gcTime: 0,
+export const useSituationProgress = () => {
+  return useMutation<SituationProgress, Error, SituationProgressRequest>({
+    mutationFn: getSituationProgress,
   });
 };

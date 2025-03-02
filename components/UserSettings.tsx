@@ -51,9 +51,6 @@ export default function UserSettings() {
     onUpdate({
       language_level: Number(formData.get("language_level")),
       language_code: selectedLanguage.code,
-      interests: (formData.get("interests") as string)
-        .split(",")
-        .map((i) => i.trim()),
       voice_id: selectedLanguage.has_tts
         ? (formData.get("voice_id") as string)
         : null,
@@ -155,18 +152,6 @@ export default function UserSettings() {
                 <option value="5">C1</option>
                 <option value="6">C2</option>
               </select>
-            </fieldset>
-
-            <fieldset className="mb-4 flex items-center gap-4">
-              <label className="w-24 text-right text-sm" htmlFor="interests">
-                Interests
-              </label>
-              <input
-                className="h-9 w-full rounded border px-2"
-                id="interests"
-                name="interests"
-                defaultValue={user.interests.join(", ")}
-              />
             </fieldset>
 
             <fieldset className="mb-4 flex items-center gap-4">

@@ -90,9 +90,6 @@ const buildModelAdapter = ({
 }): ChatModelAdapter => {
   return {
     run({ messages, abortSignal, ...rest }) {
-      console.log(rest);
-      // TODO replace with your own API
-
       // Log the stream in parallel
       return (async function* () {
         const response = await fetch(
