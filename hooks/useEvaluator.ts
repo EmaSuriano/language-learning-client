@@ -27,39 +27,6 @@ const getOverview = async (params: EvaluatorRequest) =>
     .post("/evaluator/overview", params)
     .then((res) => EvaluatorOverviewSchema.parse(res.data));
 
-const fetchMetricsReport = async (
-  params: EvaluatorRequest
-): Promise<string> => {
-  // Function to fetch metrics overview
-  const response = await api.post("/evaluator/report", params, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "text/event-stream",
-    },
-    responseType: "text",
-  });
-
-  // Parse the streamed response
-  let report = "";
-  const lines = response.data.split("\n");
-
-  for (const line of lines) {
-    if (!line.startsWith("data: ")) continue;
-
-    const data = line.slice(5).trim();
-    if (data === "[DONE]") break;
-
-    try {
-      const { content } = JSON.parse(data);
-      report += content;
-    } catch (e) {
-      console.error("JSON parsing error:", e);
-    }
-  }
-
-  return report;
-};
-
 export const useEvaluatorOverview = () => {
   return useMutation<EvaluatorOverviewResponse, Error, EvaluatorRequest>({
     mutationFn: getOverview,

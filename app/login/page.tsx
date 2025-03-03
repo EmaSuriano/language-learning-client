@@ -4,11 +4,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUser } from "@/hooks/useUser";
 import { Box, Button, Container, Theme } from "@radix-ui/themes";
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const MOCK_USER_ID = "1";
 
 export default function Login() {
+  const router = useRouter(); // Add this line
   const { session, login } = useAuth();
   const [userId, setUserId] = useState(session ? session.userId : null);
   const { data: user, error, isLoading } = useUser(userId);
@@ -20,9 +22,9 @@ export default function Login() {
   useEffect(() => {
     if (user) {
       login({ userId: user.id.toString(), email: user.email });
-      redirect("/chat");
+      router.push("/chat");
     }
-  }, [user]);
+  }, [user, router]);
 
   return (
     <Theme accentColor="blue" grayColor="slate">

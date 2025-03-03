@@ -14,6 +14,8 @@ import { SituationProgressGoalList } from "./SituationProgressGoalList";
 import { useEvaluatorOverview, useMetricsReport } from "@/hooks/useEvaluator";
 import { EvaluatorOverviewChart } from "./EvaluatorOverviewChart";
 import { ThreadMessage } from "@assistant-ui/react";
+import { useAddLearningSession } from "@/hooks/useUserLearningHistory";
+import { useRouter } from "next/navigation";
 
 export const ReportDialog = ({
   progress,
@@ -22,6 +24,7 @@ export const ReportDialog = ({
   progress: SituationProgress;
   messages: ThreadMessage[];
 }) => {
+  const router = useRouter();
   const { user, selectedSituation } = useLearningSession();
   const {
     data: overview,
@@ -30,7 +33,7 @@ export const ReportDialog = ({
     mutateAsync: fetchOverview,
   } = useEvaluatorOverview();
   const initialFetchRef = React.useRef(false);
-
+  const { mutateAsync: addLearningSession } = useAddLearningSession();
   const {
     data: report,
     isError: isReportError,
@@ -54,6 +57,27 @@ export const ReportDialog = ({
       initialFetchRef.current = true;
     }
   }, [params]);
+
+  const onSaveConversation = () => {
+    if (!overview) return;
+
+    const goalsScore =
+      (progress.goals.reduce((acc, goal) => acc + (goal.done ? 1 : 0), 0) /
+        progress.goals.length) *
+      100;
+
+    addLearningSession({
+      user_id: user.id,
+      situation_id: selectedSituation.id,
+      language_id: 1,
+      level: 1,
+      date: new Date().toISOString(),
+      grammar_score: overview.grammar,
+      vocabulary_score: overview.vocabulary,
+      fluency_score: overview.fluency,
+      goals_score: goalsScore,
+    }).then(() => router.push("/history"));
+  };
 
   return (
     <>
@@ -139,10 +163,10 @@ export const ReportDialog = ({
             <div className="mt-6 flex justify-end gap-4">
               <button
                 disabled={isOverviewError || isOverviewPending}
-                onClick={() => window.location.reload()}
+                onClick={onSaveConversation}
                 className="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
-                Start New Conversation
+                Save Conversation
               </button>
             </div>
           </Dialog.Content>
