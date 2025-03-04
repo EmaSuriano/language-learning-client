@@ -10,22 +10,48 @@ import {
   Container,
   Flex,
   Box,
+  Separator,
+  Grid,
+  Link as RadixLink,
 } from "@radix-ui/themes";
-import { Brain, Languages, Mic, MessageSquare } from "lucide-react";
+import {
+  Brain,
+  Languages,
+  Mic,
+  MessageSquare,
+  Github,
+  Book,
+  Code,
+  Users,
+} from "lucide-react";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import { redirect, RedirectType } from "next/navigation";
 import { useTheme } from "next-themes";
+import Link from "next/link";
+
+const GH_PAPER = "https://github.com/emasuriano/language-learning-paper";
+const PAPER_LINK = `https://docs.google.com/viewer?url=${GH_PAPER}/memoria.pdf?raw=true`;
+const GH_CLIENT = "https://github.com/emasuriano/language-learning-client";
+const GH_SERVER = "https://github.com/emasuriano/language-learning-server";
 
 const LandingPage = () => {
-  const { theme } = useTheme();
-
-  console.log("asdasd", theme);
-
   return (
-    <Theme accentColor="blue" grayColor="slate" appearance="dark">
-      <Box className="min-h-screen bg-[#0A0A0A]">
+    <Theme accentColor="indigo" grayColor="slate">
+      <Box className="min-h-screen">
         <Container size="4" p="6">
+          {/* Navigation */}
+          <Flex justify="between" align="center" mb="6">
+            <Heading size="6">AI Language Learning</Heading>
+            <Flex gap="4">
+              <Link href="/login" passHref>
+                <Button variant="soft" size="2">
+                  Login
+                </Button>
+              </Link>
+            </Flex>
+          </Flex>
+
           {/* Hero Section */}
           <Flex direction="column" align="center" gap="6" pb="9">
             <Heading size="9" align="center" mb="4">
@@ -40,19 +66,27 @@ const LandingPage = () => {
               Adaptive learning system that combines advanced AI with
               Reinforcement Learning techniques for a personalized experience.
             </Text>
-            <Button
-              size="4"
-              variant="solid"
-              onClick={() => redirect("/login", RedirectType.push)}
-            >
-              Get Started
-            </Button>
+            <Flex gap="4">
+              <Button
+                size="4"
+                variant="solid"
+                onClick={() => redirect("/login", RedirectType.push)}
+              >
+                Get Started
+              </Button>
+              <Link href={GH_CLIENT} passHref>
+                <Button size="4" variant="outline">
+                  <Github className="mr-2" size={18} />
+                  View on GitHub
+                </Button>
+              </Link>
+            </Flex>
           </Flex>
 
           {/* Stats Section */}
           <Flex justify="center" gap="8" wrap="wrap">
-            <StatBox number="8+" label="Supported Languages" />
-            <StatBox number="24/7" label="Availability" />
+            <StatBox number="20+" label="Supported Languages" />
+            <StatBox number="Free" label="Open Source" />
             <StatBox number="100%" label="Personalized" />
           </Flex>
 
@@ -64,7 +98,10 @@ const LandingPage = () => {
           </Box>
 
           {/* Features Grid */}
-          <Flex gap="6" wrap="wrap" justify="center" mt="9">
+          <Heading size="6" align="center" mb="6">
+            Key Features
+          </Heading>
+          <Flex gap="6" wrap="wrap" justify="center" mb="9">
             <FeatureCard
               icon={<Brain size={32} />}
               title="Adaptive Learning"
@@ -86,19 +123,134 @@ const LandingPage = () => {
               description="Support for 8 major languages"
             />
             <FeatureCard
-              icon={<Languages size={32} />}
-              title="Multiple Languages"
-              description="Support for 8 major languages"
+              icon={<Users size={32} />}
+              title="Progress Tracking"
+              description="Detailed analytics and learning history"
             />
           </Flex>
+
+          {/* Research Paper Section */}
+          <Card size="3" style={{ maxWidth: "800px", margin: "0 auto" }} my="9">
+            <Flex direction="column" gap="4" p="4">
+              <Heading size="6">Research Paper</Heading>
+              <Text>
+                This project is the implementation of the research presented in
+                our paper on adaptive language learning systems. The paper
+                details the methodology, algorithms, and evaluation results.
+              </Text>
+              <Link href={PAPER_LINK} passHref>
+                <Button variant="outline">
+                  <Book size={16} />
+                  Read the Paper
+                </Button>
+              </Link>
+            </Flex>
+          </Card>
+
+          {/* GitHub Repositories Section */}
+          <Box my="9">
+            <Heading size="6" align="center" mb="6">
+              Open Source
+            </Heading>
+            <Grid columns={{ initial: "1", sm: "2" }} gap="6">
+              <Card>
+                <Flex direction="column" gap="3">
+                  <Flex align="center" gap="2">
+                    <Github size={24} />
+                    <Heading size="4">Frontend Repository</Heading>
+                  </Flex>
+                  <Text>
+                    This client-side repository contains the React/Next.js
+                    implementation of our language learning platform.
+                  </Text>
+                  <Link href={GH_CLIENT} passHref>
+                    <Button variant="soft" size="2">
+                      View Frontend Code
+                    </Button>
+                  </Link>
+                </Flex>
+              </Card>
+
+              <Card>
+                <Flex direction="column" gap="3">
+                  <Flex align="center" gap="2">
+                    <Github size={24} />
+                    <Heading size="4">Backend Repository</Heading>
+                  </Flex>
+                  <Text>
+                    Our backend repository houses the AI models, language
+                    processing systems, and API implementation.
+                  </Text>
+                  <Link href={GH_SERVER} passHref>
+                    <Button variant="soft" size="2">
+                      View Backend Code
+                    </Button>
+                  </Link>
+                </Flex>
+              </Card>
+            </Grid>
+          </Box>
+
+          {/* How It Works Section */}
+          <Box my="9">
+            <Heading size="6" align="center" mb="6">
+              How It Works
+            </Heading>
+            <Flex direction="column" gap="6">
+              <StepCard
+                number="1"
+                title="Choose a Language & Scenario"
+                description="Select from multiple languages and practical conversation scenarios"
+              />
+              <StepCard
+                number="2"
+                title="Practice with AI"
+                description="Engage in natural conversations with our AI, which adapts to your proficiency level"
+              />
+              <StepCard
+                number="3"
+                title="Get Real-time Feedback"
+                description="Receive instant feedback on grammar, vocabulary, and pronunciation"
+              />
+              <StepCard
+                number="4"
+                title="Track Your Progress"
+                description="View detailed analytics and progress over time with comprehensive reports"
+              />
+            </Flex>
+          </Box>
         </Container>
 
         {/* Footer */}
-        <Box mt="9" py="6" style={{ borderTop: "1px solid var(--gray-a5)" }}>
+        <Separator size="4" />
+        <Box py="6">
           <Container size="4">
-            <Text align="center" size="2" color="gray">
-              © 2025 AI Language Learning System. All rights reserved.
-            </Text>
+            <Flex justify="between" wrap="wrap" gap="4">
+              <Flex direction="column" gap="2">
+                <Heading size="4">AI Language Learning</Heading>
+                <Text size="2" color="gray">
+                  An adaptive language learning platform
+                </Text>
+              </Flex>
+
+              <Flex gap="6" wrap="wrap">
+                <Flex direction="column" gap="2">
+                  <Text weight="bold" size="2">
+                    Resources
+                  </Text>
+                  <Link href={GH_CLIENT} passHref>
+                    <Text size="2" color="gray">
+                      Documentation
+                    </Text>
+                  </Link>
+                  <Link href="#" passHref>
+                    <Text size="2" color="gray">
+                      Research Paper
+                    </Text>
+                  </Link>
+                </Flex>
+              </Flex>
+            </Flex>
           </Container>
         </Box>
       </Box>
@@ -142,6 +294,32 @@ const StatBox: React.FC<StatBoxProps> = ({ number, label }) => (
       {label}
     </Text>
   </Flex>
+);
+
+interface StepCardProps {
+  number: string;
+  title: string;
+  description: string;
+}
+
+const StepCard: React.FC<StepCardProps> = ({ number, title, description }) => (
+  <Card>
+    <Flex align="center" gap="4">
+      <Flex
+        align="center"
+        justify="center"
+        className="bg-blue-600 text-white rounded-full w-10 h-10 flex-shrink-0"
+      >
+        {number}
+      </Flex>
+      <Flex direction="column">
+        <Heading size="3">{title}</Heading>
+        <Text size="2" color="gray">
+          {description}
+        </Text>
+      </Flex>
+    </Flex>
+  </Card>
 );
 
 export default LandingPage;
