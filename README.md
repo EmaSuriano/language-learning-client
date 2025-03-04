@@ -77,13 +77,15 @@ This server provides the API endpoints, natural language processing capabilities
 
 ## Screens
 
-| Screen                                                                                                                             | Description                                                                                      |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| ![Situation Picker](https://private-user-images.githubusercontent.com/3399429/411693357-f1b262b1-1383-4d23-9129-9248839b5944.png)  | **Situation Picker**: Select language learning scenarios based on difficulty level and context   |
-| ![Initial Chat](https://private-user-images.githubusercontent.com/3399429/418742418-0a7c314e-265f-41fa-9d17-8f3350409544.png)      | **Initial Chat**: Beginning of a conversation with instructions and context                      |
-| ![Chat Interface](https://private-user-images.githubusercontent.com/3399429/411693356-193bb62f-df19-4fe2-8590-101da4a17d2e.png)    | **Chat Interface**: Interactive conversation with real-time feedback and assistance              |
-| ![Evaluation Report](https://private-user-images.githubusercontent.com/3399429/418724089-bee6d9a3-fa35-4c59-a5b1-3bcf97697e05.png) | **Evaluation Report**: Detailed assessment of the conversation with language proficiency metrics |
-| ![History Graph](https://private-user-images.githubusercontent.com/3399429/418730055-ad93d8a8-11fb-47ea-affe-df486ab89197.png)     | **History Graph**: Visualization of progress and performance over time                           |
+https://private-user-images.githubusercontent.com/3399429/411693357-f1b262b1-1383-4d23-9129-9248839b5944.png
+
+| Screen                                                                                                | Description                                                                                      |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| ![Situation Picker](https://github.com/user-attachments/assets/97c3e4e6-2a75-4d90-a2e9-422afb081344)  | **Situation Picker**: Select language learning scenarios based on difficulty level and context   |
+| ![Initial Chat](https://github.com/user-attachments/assets/0a7c314e-265f-41fa-9d17-8f3350409544)      | **Initial Chat**: Beginning of a conversation with instructions and context                      |
+| ![Chat Interface](https://github.com/user-attachments/assets/193bb62f-df19-4fe2-8590-101da4a17d2e)    | **Chat Interface**: Interactive conversation with real-time feedback and assistance              |
+| ![Evaluation Report](https://github.com/user-attachments/assets/bee6d9a3-fa35-4c59-a5b1-3bcf97697e05) | **Evaluation Report**: Detailed assessment of the conversation with language proficiency metrics |
+| ![Learning History](https://github.com/user-attachments/assets/ad93d8a8-11fb-47ea-affe-df486ab89197)  | **Learning History**: Visualization of progress and performance over time                        |
 
 ## Application Structure
 
