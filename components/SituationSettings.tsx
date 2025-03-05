@@ -1,89 +1,181 @@
 "use client";
 
-import { Dialog } from "radix-ui";
-import { useState } from "react";
+import {
+  Box,
+  Button,
+  Text,
+  Flex,
+  Card,
+  Heading,
+  Separator,
+  Theme,
+  TextField,
+} from "@radix-ui/themes";
+import * as Dialog from "@radix-ui/react-dialog";
+import { useState, useEffect } from "react";
 import { capitalize } from "@/lib/helpers";
 import { Situation, useSituations } from "@/hooks/useSituations";
 import { useSelectedSituationStore } from "@/hooks/useLearningSession";
 import { SituationProgressGoalList } from "./SituationProgressGoalList";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import clsx from "clsx";
+
+// Define classNames outside of component to keep it clean
+const classes = {
+  situationList: "w-1/2 overflow-y-auto border-r border-gray-200 pr-4",
+  situationButton: "w-full text-left py-2 px-3 h-auto block",
+  situationName: "block mb-1 truncate",
+  situationDescription: "line-clamp-2 text-left text-wrap break-words",
+  detailsPanel: "w-1/2 overflow-y-auto pl-2",
+  contentPanel: "h-[450px]",
+};
 
 const SituationSettings = () => {
   const { setSelectedSituation } = useSelectedSituationStore();
-  const [currentSituation, setCurrentSituation] = useState<Situation>();
+  const [currentSituation, setCurrentSituation] = useState<Situation | null>(
+    null
+  );
   const { data: situations = [] } = useSituations();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredSituations, setFilteredSituations] = useState<Situation[]>([]);
+
+  // Filter situations based on search term
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredSituations(situations);
+    } else {
+      const searchTermLower = searchTerm.toLowerCase();
+      const filtered = situations.filter((situation) => {
+        const { name, scenario_description } = situation;
+        return (
+          name.toLowerCase().includes(searchTermLower) ||
+          scenario_description.toLowerCase().includes(searchTermLower)
+        );
+      });
+      setFilteredSituations(filtered);
+    }
+  }, [searchTerm, situations]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!currentSituation) {
-      return;
-    }
-
+    if (!currentSituation) return;
     setSelectedSituation(currentSituation);
   };
 
   return (
     <Dialog.Root open>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-blackA6 data-[state=open]:animate-overlayShow" />
-        <Dialog.Content
-          onInteractOutside={(e) => e.preventDefault()}
-          className="fixed left-1/2 top-1/2 max-h-[85vh] w-[70vw] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-6 shadow-lg"
-        >
-          <Dialog.Title className="m-0 text-[17px] font-medium text-black">
-            Available Situations
-          </Dialog.Title>
-          <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal text-mauve11">
-            Select a situation to practice your conversation skills.
-          </Dialog.Description>
+        <Dialog.Overlay className="fixed inset-0 bg-black/25 animate-fade-in" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[70vw] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-gray-50 shadow-lg">
+          <Theme accentColor="indigo" grayColor="slate">
+            <Card size="3">
+              <Flex direction="column" gap="3">
+                <Dialog.Title asChild>
+                  <Heading size="5">Available Situations</Heading>
+                </Dialog.Title>
+                <Dialog.Description asChild>
+                  <Text size="2" color="gray">
+                    Select a situation to practice your conversation skills.
+                  </Text>
+                </Dialog.Description>
 
-          <form onSubmit={handleSubmit}>
-            <div className="flex gap-4 h-[500px]">
-              {/* Situations List */}
-              <div className="w-1/2 overflow-y-auto pr-4 border-r border-gray-200">
-                {situations.map((situation) => (
-                  <button
-                    type="button"
-                    key={situation.id}
-                    onClick={() => setCurrentSituation(situation)}
-                    className={`w-full text-left p-3 mb-2 rounded-md transition-colors ${
-                      currentSituation?.id === situation.id
-                        ? "bg-violet4 text-violet11"
-                        : "hover:bg-gray-100"
-                    }`}
-                  >
-                    <h3 className="font-medium text-[15px]">
-                      {situation.name}
-                    </h3>
-                    <p className="text-[13px] text-mauve11 line-clamp-2">
-                      {situation.scenario_description}
-                    </p>
-                  </button>
-                ))}
-              </div>
+                <form onSubmit={handleSubmit}>
+                  <Box mb="3">
+                    <TextField.Root
+                      size="2"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search situations..."
+                    >
+                      <TextField.Slot>
+                        <MagnifyingGlassIcon height={16} width={16} />
+                      </TextField.Slot>
+                    </TextField.Root>
+                  </Box>
 
-              {/* Selected Situation Details */}
-              <div className="w-1/2 overflow-y-auto">
-                {currentSituation ? (
-                  <SituationViewer situation={currentSituation} />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-mauve11">
-                    Select a situation to view details
-                  </div>
-                )}
-              </div>
-            </div>
+                  <Flex gap="4" className={classes.contentPanel}>
+                    {/* Situations List */}
+                    <Box className={classes.situationList}>
+                      {filteredSituations.length > 0 ? (
+                        filteredSituations.map((situation) => (
+                          <Box key={situation.id} mb="2" width="100%">
+                            <Button
+                              type="button"
+                              onClick={() => setCurrentSituation(situation)}
+                              variant="ghost"
+                              color={
+                                currentSituation?.id === situation.id
+                                  ? "indigo"
+                                  : "gray"
+                              }
+                              className={clsx(
+                                classes.situationButton,
+                                currentSituation?.id === situation.id &&
+                                  "bg-indigo-500"
+                              )}
+                            >
+                              <Flex direction="column" align="start" p="2">
+                                <Text
+                                  size="2"
+                                  weight="medium"
+                                  className={classes.situationName}
+                                >
+                                  {situation.name}
+                                </Text>
+                                <Text
+                                  size="1"
+                                  color="gray"
+                                  className={classes.situationDescription}
+                                >
+                                  {situation.scenario_description}
+                                </Text>
+                              </Flex>
+                            </Button>
+                          </Box>
+                        ))
+                      ) : (
+                        <Flex align="center" justify="center" height="100%">
+                          <Text size="2" color="gray">
+                            No situations found
+                          </Text>
+                        </Flex>
+                      )}
+                    </Box>
 
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                disabled={currentSituation === null}
-                type="submit"
-                className="disabled:bg-violet2 disabled:text-violet5 inline-flex h-[35px] items-center justify-center rounded bg-violet4 px-[15px] font-medium leading-none text-violet11 outline-none hover:bg-violet5"
-              >
-                Save changes
-              </button>
-            </div>
-          </form>
+                    {/* Selected Situation Details */}
+                    <Box className={classes.detailsPanel}>
+                      {currentSituation ? (
+                        <SituationViewer situation={currentSituation} />
+                      ) : (
+                        <Flex align="center" justify="center" height="100%">
+                          <Text size="2" color="gray">
+                            Select a situation to view details
+                          </Text>
+                        </Flex>
+                      )}
+                    </Box>
+                  </Flex>
+
+                  <Separator size="4" my="4" />
+
+                  <Flex justify="end" gap="3" mt="4">
+                    <Dialog.Close asChild>
+                      <Button variant="soft" color="gray">
+                        Cancel
+                      </Button>
+                    </Dialog.Close>
+                    <Button
+                      disabled={!currentSituation}
+                      type="submit"
+                      color="indigo"
+                    >
+                      Save changes
+                    </Button>
+                  </Flex>
+                </form>
+              </Flex>
+            </Card>
+          </Theme>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -94,24 +186,31 @@ const SituationViewer = ({ situation }: { situation: Situation }) => {
   const { name, scenario_description, difficulty, user_goals } = situation;
 
   return (
-    <div className="p-2">
-      <h3 className="font-medium text-[16px] mb-3">{name}</h3>
-      <p className="text-[14px] text-mauve11 mb-4">{scenario_description}</p>
+    <Box p="3">
+      <Heading size="4" mb="3">
+        {name}
+      </Heading>
+      <Text size="2" color="gray" mb="4">
+        {scenario_description}
+      </Text>
 
-      <div className="flex gap-2 my-2">
-        <h4 className="font-medium text-[14px] text-violet11">Difficulty:</h4>
-
-        <p className="font-medium text-[14px] text-mauve11">
+      <Flex gap="2" my="2" align="center">
+        <Text size="2" weight="medium" color="indigo">
+          Difficulty:
+        </Text>
+        <Text size="2" color="gray" weight="medium">
           {capitalize(difficulty)}
-        </p>
-      </div>
+        </Text>
+      </Flex>
 
-      <h4 className="font-medium text-md mb-2 text-violet11">User Goals:</h4>
+      <Text size="2" weight="medium" color="indigo" mb="2">
+        User Goals:
+      </Text>
 
       <SituationProgressGoalList
         goals={user_goals.map((name) => ({ name, done: false }))}
       />
-    </div>
+    </Box>
   );
 };
 

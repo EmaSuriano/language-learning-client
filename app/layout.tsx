@@ -8,6 +8,7 @@ import "@radix-ui/themes/styles.css";
 
 import IntlProvider from "@/components/IntlProvider";
 import { QueryClientProvider } from "@/components/QueryClientProvider";
+import { Theme } from "@radix-ui/themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,9 +40,11 @@ export default function RootLayout({
           storageKey="nightwind-mode"
           defaultTheme="system"
         >
-          <QueryClientProvider>
-            <Suspense>{children}</Suspense>
-          </QueryClientProvider>
+          <Theme accentColor="indigo" grayColor="slate">
+            <QueryClientProvider>
+              <Suspense>{children}</Suspense>
+            </QueryClientProvider>
+          </Theme>
         </ThemeProvider>
       </body>
     </html>
