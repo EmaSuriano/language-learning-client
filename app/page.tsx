@@ -12,7 +12,6 @@ import {
   Box,
   Separator,
   Grid,
-  Link as RadixLink,
 } from "@radix-ui/themes";
 import {
   Brain,
@@ -21,19 +20,18 @@ import {
   MessageSquare,
   Github,
   Book,
-  Code,
   Users,
 } from "lucide-react";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import { redirect, RedirectType } from "next/navigation";
-import { useTheme } from "next-themes";
 import Link from "next/link";
 
-const GH_PAPER = "https://github.com/emasuriano/language-learning-paper";
+const GH_USER = "https://github.com/emasuriano";
+const GH_PAPER = `${GH_USER}/language-learning-paper`;
+const GH_CLIENT = `${GH_USER}/language-learning-client`;
+const GH_SERVER = `${GH_USER}/language-learning-server`;
 const PAPER_LINK = `https://docs.google.com/viewer?url=${GH_PAPER}/memoria.pdf?raw=true`;
-const GH_CLIENT = "https://github.com/emasuriano/language-learning-client";
-const GH_SERVER = "https://github.com/emasuriano/language-learning-server";
 
 const LandingPage = () => {
   return (
