@@ -12,7 +12,7 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { capitalize } from "@/lib/helpers";
 import { Situation, useSituations } from "@/hooks/useSituations";
 import { useSelectedSituationStore } from "@/hooks/useLearningSession";
@@ -22,7 +22,6 @@ import clsx from "clsx";
 
 // Define classNames outside of component to keep it clean
 const classes = {
-  situationList: "w-1/2 overflow-y-auto border-r border-gray-200 pr-4",
   situationButton: "w-full text-left py-2 px-3 h-auto block",
   situationName: "block mb-1 truncate",
   situationDescription: "line-clamp-2 text-left text-wrap break-words",
@@ -37,22 +36,19 @@ const SituationSettings = () => {
   );
   const { data: situations = [] } = useSituations();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSituations, setFilteredSituations] = useState<Situation[]>([]);
 
-  // Filter situations based on search term
-  useEffect(() => {
+  const filteredSituations = useMemo(() => {
     if (!searchTerm.trim()) {
-      setFilteredSituations(situations);
+      return situations;
     } else {
       const searchTermLower = searchTerm.toLowerCase();
-      const filtered = situations.filter((situation) => {
+      return situations.filter((situation) => {
         const { name, scenario_description } = situation;
         return (
           name.toLowerCase().includes(searchTermLower) ||
           scenario_description.toLowerCase().includes(searchTermLower)
         );
       });
-      setFilteredSituations(filtered);
     }
   }, [searchTerm, situations]);
 
@@ -95,7 +91,7 @@ const SituationSettings = () => {
 
                   <Flex gap="4" className={classes.contentPanel}>
                     {/* Situations List */}
-                    <Box className={classes.situationList}>
+                    <Box className="w-1/2 overflow-y-auto border-r border-gray-200 p-2">
                       {filteredSituations.length > 0 ? (
                         filteredSituations.map((situation) => (
                           <Box key={situation.id} mb="2" width="100%">
@@ -159,17 +155,12 @@ const SituationSettings = () => {
                   <Separator size="4" my="4" />
 
                   <Flex justify="end" gap="3" mt="4">
-                    <Dialog.Close asChild>
-                      <Button variant="soft" color="gray">
-                        Cancel
-                      </Button>
-                    </Dialog.Close>
                     <Button
                       disabled={!currentSituation}
                       type="submit"
                       color="indigo"
                     >
-                      Save changes
+                      Confirm
                     </Button>
                   </Flex>
                 </form>

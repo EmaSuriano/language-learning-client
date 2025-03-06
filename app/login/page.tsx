@@ -15,7 +15,7 @@ import {
 } from "@radix-ui/themes";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   EnvelopeClosedIcon,
   LockClosedIcon,
@@ -83,6 +83,12 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (session?.userId) {
+      router.push("/chat"); // Direct navigation
+    }
+  }, []);
 
   return (
     <Box className="min-h-screen bg-slate-50">

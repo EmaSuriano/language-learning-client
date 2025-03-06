@@ -8,6 +8,7 @@ import { MyRuntimeProvider } from "@/components/MyRuntimeProvider";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import IntlProvider from "@/components/IntlProvider";
 import { useSelectedSituationStore } from "@/hooks/useLearningSession";
+import SidebarLayout from "@/components/SidebarLayout";
 
 export default function Chat() {
   const { selectedSituation } = useSelectedSituationStore();
@@ -23,12 +24,13 @@ export default function Chat() {
 
 const InnerChat = () => {
   return (
-    <MyRuntimeProvider>
-      <main className="h-dvh">
-        <MyAssistant />
-        <UserSettings />
-        <ProgressTracker />
-      </main>
-    </MyRuntimeProvider>
+    <SidebarLayout>
+      <MyRuntimeProvider>
+        <main className="h-dvh">
+          <MyAssistant />
+          <ProgressTracker />
+        </main>
+      </MyRuntimeProvider>
+    </SidebarLayout>
   );
 };

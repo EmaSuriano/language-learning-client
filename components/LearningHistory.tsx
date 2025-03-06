@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,
@@ -32,11 +32,16 @@ import {
 import { useUserLearningHistory } from "@/hooks/useUserLearningHistory";
 import { useAuthUser } from "@/hooks/useLearningSession";
 import { useRouter } from "next/navigation";
+import { LoopIcon, ChatBubbleIcon } from "@radix-ui/react-icons";
 import {
-  ButtonIcon,
-  LoopIcon,
-  MagnifyingGlassIcon,
-} from "@radix-ui/react-icons";
+  Languages,
+  ArrowUp,
+  ArrowDown,
+  MoveUpRight,
+  MoveDownRight,
+  MoveRight,
+} from "lucide-react";
+import Link from "next/link";
 
 export const LearningHistory = () => {
   const { user } = useAuthUser();
@@ -81,83 +86,105 @@ export const LearningHistory = () => {
   // Handle loading and error states
   if (loading) {
     return (
-      <Container size="4">
-        <Card size="3" my="4">
-          <Flex height="16" align="center" justify="center">
-            <Box className="animate-pulse flex space-x-4 w-1/2">
-              <Box className="rounded-full bg-slate-200 h-10 w-10"></Box>
-              <Box className="flex-1 space-y-6 py-1">
-                <Box className="h-2 bg-slate-200 rounded"></Box>
-                <Box className="space-y-3">
-                  <Box className="grid grid-cols-3 gap-4">
-                    <Box className="h-2 bg-slate-200 rounded col-span-2"></Box>
-                    <Box className="h-2 bg-slate-200 rounded col-span-1"></Box>
-                  </Box>
+      <Box className="min-h-screen bg-slate-50">
+        <Container size="1" pt="6">
+          <Card size="3" className="shadow-md">
+            <Flex height="16" align="center" justify="center">
+              <Box className="animate-pulse flex space-x-4 w-1/2">
+                <Box className="rounded-full bg-slate-200 h-10 w-10"></Box>
+                <Box className="flex-1 space-y-6 py-1">
                   <Box className="h-2 bg-slate-200 rounded"></Box>
+                  <Box className="space-y-3">
+                    <Box className="grid grid-cols-3 gap-4">
+                      <Box className="h-2 bg-slate-200 rounded col-span-2"></Box>
+                      <Box className="h-2 bg-slate-200 rounded col-span-1"></Box>
+                    </Box>
+                    <Box className="h-2 bg-slate-200 rounded"></Box>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </Flex>
-        </Card>
-      </Container>
+            </Flex>
+          </Card>
+        </Container>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Container size="4">
-        <Card size="3" my="4">
-          <Flex height="16" align="center" justify="center">
-            <Text color="red" size="3">
-              {error.message}
-            </Text>
-          </Flex>
-        </Card>
-      </Container>
+      <Box className="min-h-screen bg-slate-50">
+        <Container size="1" pt="6">
+          <Card size="3" className="shadow-md">
+            <Flex height="16" align="center" justify="center">
+              <Text color="red" size="3">
+                {error.message}
+              </Text>
+            </Flex>
+          </Card>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <Container size="4">
-      <Card size="3" my="4">
-        <Flex direction="column" gap="4">
+    <Box className="min-h-screen bg-slate-50">
+      <Container size="4" p="6">
+        <Card size="3" className="shadow-md">
+          {/* Header with logo - matching login page */}
+          {/* Title without duplicating the app name */}
           <Flex
             justify="between"
             align={{ initial: "start", sm: "center" }}
             direction={{ initial: "column", sm: "row" }}
             gap="4"
+            mb="4"
           >
-            <Flex gap="2">
-              <Heading size="5">Language Learning Progress</Heading>
-              <IconButton
-                radius="full"
-                variant="soft"
-                onClick={() => refetch()}
-              >
-                <LoopIcon width="18" height="18" />
-              </IconButton>
+            <Flex direction="column" mb="4">
+              <Flex gap="2" align="center">
+                <Heading size="6">Learning Progress Dashboard</Heading>
+                <IconButton
+                  radius="full"
+                  variant="soft"
+                  onClick={() => refetch()}
+                >
+                  <LoopIcon width="18" height="18" />
+                </IconButton>
+              </Flex>
+
+              <Text size="2" color="gray">
+                Track your language learning journey with detailed analytics
+              </Text>
             </Flex>
 
-            <Flex gap="4" align="center" justify="center">
+            <Flex gap="4" align="center">
               <Tabs.Root
                 defaultValue="detailed"
                 value={viewMode}
                 onValueChange={setViewMode}
               >
-                <Tabs.List>
-                  <Tabs.Trigger value="detailed">Detailed View</Tabs.Trigger>
-                  <Tabs.Trigger value="trend">Trend View</Tabs.Trigger>
+                <Tabs.List className="flex border-b">
+                  <Tabs.Trigger
+                    className="px-4 py-2 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500"
+                    value="detailed"
+                  >
+                    Detailed
+                  </Tabs.Trigger>
+                  <Tabs.Trigger
+                    className="px-4 py-2 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500"
+                    value="trend"
+                  >
+                    Trend
+                  </Tabs.Trigger>
                 </Tabs.List>
               </Tabs.Root>
-
-              <Button onClick={() => router.push("/chat")}>New chat</Button>
             </Flex>
           </Flex>
 
-          {/* Chart container with explicit height */}
+          {/* Chart container */}
           <Box
             style={{ height: "400px", width: "100%" }}
             className="chart-container"
+            mb="4"
           >
             <Tabs.Root
               value={viewMode}
@@ -290,7 +317,7 @@ export const LearningHistory = () => {
             </Tabs.Root>
           </Box>
 
-          <Separator size="4" />
+          <Separator size="4" my="4" />
 
           <Grid columns={{ initial: "1", sm: "2", md: "4" }} gap="4">
             <Card style={{ backgroundColor: "var(--violet-3)" }}>
@@ -350,57 +377,45 @@ export const LearningHistory = () => {
             </Card>
           </Grid>
 
-          <Separator size="4" />
+          <Separator size="4" my="4" />
 
-          <Card style={{ backgroundColor: "var(--gray-2)" }}>
-            <Flex direction="column" gap="3">
-              <Heading size="3">Level Changes Summary</Heading>
-              <Grid columns={{ initial: "1", sm: "3" }} gap="4">
-                {Object.entries(_.countBy(chartData, "level_change")).map(
-                  ([change, count]) => (
-                    <Card
-                      key={change}
-                      style={{
-                        backgroundColor:
-                          change === "INCREASE"
-                            ? "var(--green-2)"
-                            : change === "DECREASE"
-                            ? "var(--red-2)"
-                            : "var(--blue-2)",
-                      }}
+          {/* Features highlights - matching login page style */}
+          <Box pt="2">
+            <Heading size="3" mb="2">
+              Level Changes Summary
+            </Heading>
+            <Flex direction="column" gap="2">
+              {Object.entries(_.countBy(chartData, "level_change")).map(
+                ([change, count]) => (
+                  <Flex key={change} align="center" gap="2">
+                    <Box
+                      className={
+                        change === "INCREASE"
+                          ? "text-green-600"
+                          : change === "DECREASE"
+                          ? "text-red-600"
+                          : "text-indigo-600"
+                      }
                     >
-                      <Flex direction="column" align="center" gap="2">
-                        <Text
-                          size="2"
-                          weight="bold"
-                          color={
-                            change === "INCREASE"
-                              ? "green"
-                              : change === "DECREASE"
-                              ? "red"
-                              : "blue"
-                          }
-                        >
-                          {change}
-                        </Text>
-                        <Flex align="baseline" gap="1" justify="center">
-                          <Text size="6" weight="bold">
-                            {count}
-                          </Text>
-                          <Text size="1" color="gray">
-                            sessions
-                          </Text>
-                        </Flex>
-                      </Flex>
-                    </Card>
-                  )
-                )}
-              </Grid>
+                      {change === "INCREASE" ? (
+                        <MoveUpRight size={16} />
+                      ) : change === "DECREASE" ? (
+                        <MoveDownRight size={16} />
+                      ) : (
+                        <MoveRight size={16} />
+                      )}
+                    </Box>
+                    <Text size="2">
+                      {change}: <strong>{count}</strong> sessions
+                    </Text>
+                  </Flex>
+                )
+              )}
             </Flex>
-          </Card>
-        </Flex>
-      </Card>
-    </Container>
+          </Box>
+        </Card>
+      </Container>
+    </Box>
   );
 };
 
