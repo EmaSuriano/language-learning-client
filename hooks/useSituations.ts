@@ -1,6 +1,6 @@
 // src/hooks/useSituations.ts
 import { api } from "@/lib/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 
 export const SituationSchema = z.object({

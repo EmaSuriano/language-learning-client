@@ -32,7 +32,7 @@ const GH_USER = "https://github.com/emasuriano";
 const GH_PAPER = `${GH_USER}/language-learning-paper`;
 const GH_CLIENT = `${GH_USER}/language-learning-client`;
 const GH_SERVER = `${GH_USER}/language-learning-server`;
-const PAPER_LINK = `https://docs.google.com/viewer?url=${GH_PAPER}/memoria.pdf?raw=true`;
+const PAPER_LINK = `https://docs.google.com/viewer?url=${GH_PAPER}/blob/main/memoria.pdf?raw=true`;
 
 const LandingPage = () => {
   return (
