@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Languages,
-  Settings,
-  History,
   LogOut,
   MessageSquare,
+  User,
+  ChartArea,
 } from "lucide-react";
 import { useAuthUser } from "@/hooks/useLearningSession";
 
@@ -31,16 +31,16 @@ export default function Sidebar({
     {
       label: "New chat",
       icon: <MessageSquare size={collapsed ? 24 : 20} />,
-      href: "/chat",
+      href: "/new-chat",
     },
     {
-      label: "Settings",
-      icon: <Settings size={collapsed ? 24 : 20} />,
+      label: "User profile",
+      icon: <User size={collapsed ? 24 : 20} />,
       href: "/settings",
     },
     {
-      label: "Learning History",
-      icon: <History size={collapsed ? 24 : 20} />,
+      label: "Learning Progress",
+      icon: <ChartArea size={collapsed ? 24 : 20} />,
       href: "/history",
     },
   ];

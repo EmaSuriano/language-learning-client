@@ -39,6 +39,7 @@ export const useUserLearningHistory = (userId: number) => {
   return useQuery({
     queryKey: ["learning-history", userId],
     queryFn: () => getUserLearningHistory(userId),
+    gcTime: 0,
   });
 };
 

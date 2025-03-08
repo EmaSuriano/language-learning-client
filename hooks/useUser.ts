@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 
 const UserSchema = z.object({
   id: z.number(),
+  name: z.string(),
   email: z.string().email(),
   current_language: LanguageSchema,
   language_level: z.number().min(1).max(5),
@@ -14,6 +15,7 @@ const UserSchema = z.object({
 export type User = z.infer<typeof UserSchema>;
 
 export type UserUpdate = Partial<{
+  name: User["name"];
   language_code: Language["code"];
   language_level: User["language_level"];
   voice_id: User["voice_id"];

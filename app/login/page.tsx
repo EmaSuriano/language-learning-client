@@ -48,7 +48,7 @@ export default function Login() {
       if (email && password) {
         // Mock successful login
         await login({ userId: "1", email: email }); // Directly call login here
-        router.push("/chat"); // Direct navigation
+        router.push("/new-chat"); // Direct navigation
       } else {
         setFormError("Please enter both email and password");
       }
@@ -72,7 +72,7 @@ export default function Login() {
       if (email && password) {
         // Mock successful signup
         await login({ userId: "1", email: email }); // Directly call login here
-        router.push("/chat"); // Direct navigation
+        router.push("/new-chat"); // Direct navigation
       } else {
         setFormError("Please enter both email and password");
       }
@@ -86,7 +86,7 @@ export default function Login() {
 
   useEffect(() => {
     if (session?.userId) {
-      router.push("/chat"); // Direct navigation
+      router.push("/new-chat"); // Direct navigation
     }
   }, []);
 

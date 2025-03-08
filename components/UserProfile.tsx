@@ -14,41 +14,12 @@ import {
   Avatar,
 } from "@radix-ui/themes";
 
-// Styles for animations
-const styles = {
-  fadeInOut: `
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateY(-20px); }
-      10% { opacity: 1; transform: translateY(0); }
-      90% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-20px); }
-    }
-    .animate-fade-in-out {
-      animation: fadeInOut 3s forwards;
-    }
-  `,
-  spinner: `
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .spinner {
-      display: inline-block;
-      width: 1rem;
-      height: 1rem;
-      border-radius: 50%;
-      border: 2px solid #e2e8f0;
-      border-top-color: #3366ff;
-      animation: spin 1s linear infinite;
-    }
-  `,
-};
 import {
   CheckCircledIcon,
   ExclamationTriangleIcon,
 } from "@radix-ui/react-icons";
 import { Switch } from "radix-ui";
-import { Languages, Save, ArrowLeft, User, Mail, Calendar } from "lucide-react";
-import Link from "next/link";
+import { Save, User, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { formatVoiceTitle } from "@/lib/helpers";
 import { useAppConfigStore } from "@/hooks/useAppConfigStore";
@@ -58,13 +29,18 @@ import { useLanguages } from "@/hooks/useLanguages";
 import { useTTSVoices } from "@/hooks/useTTS";
 import { useUpdateUser } from "@/hooks/useUser";
 
+const CEFR_LEVELS = [
+  "A1 - Beginner",
+  "A2 - Elementary",
+  "B1 - Intermediate",
+  "B2 - Upper Intermediate",
+  "C1 - Advanced",
+  "C2 - Proficient",
+];
+
 export default function UserProfilePage() {
   const router = useRouter();
-  const {
-    mutateAsync: updateUser,
-    isPending: isUpdating,
-    error: updateError,
-  } = useUpdateUser();
+  const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
   const { user } = useAuthUser();
 
   const {
@@ -110,7 +86,7 @@ export default function UserProfilePage() {
     setTheme(Boolean(formData.get("theme")) ? "dark" : "light");
 
     const success = await onUpdate({
-      language_level: Number(formData.get("language_level")),
+      name: formData.get("name") as string,
       language_code: selectedLanguage.code,
       voice_id: selectedLanguage.has_tts
         ? (formData.get("voice_id") as string)
@@ -271,7 +247,7 @@ export default function UserProfilePage() {
             </Box>
           )}
 
-          <Card variant="outline" className="p-4">
+          <Card variant="classic" className="p-4">
             <Flex gap="4" align="center">
               <Avatar
                 size="4"
@@ -289,14 +265,6 @@ export default function UserProfilePage() {
                     {user.email || "No email provided"}
                   </Text>
                 </Flex>
-                {user.created_at && (
-                  <Flex align="center" gap="2">
-                    <Calendar size={14} className="text-gray-500" />
-                    <Text size="2" color="gray">
-                      Member since {formatDate(user.created_at)}
-                    </Text>
-                  </Flex>
-                )}
               </Flex>
 
               <Box className="w-full" />
@@ -318,6 +286,46 @@ export default function UserProfilePage() {
 
           <form onSubmit={handleSubmit}>
             <Flex direction="column" gap="6">
+              <Box className="space-y-4">
+                <Heading size="3">Personal Information</Heading>
+
+                <Flex direction="column" gap="4">
+                  <Flex align="center" justify="between">
+                    <Text size="2" weight="medium">
+                      Name
+                    </Text>
+                    <Box className="w-2/3">
+                      <input
+                        type="text"
+                        className="h-9 w-full rounded border px-2"
+                        id="name"
+                        name="name"
+                        defaultValue={user.name || ""}
+                        placeholder="Enter your name"
+                      />
+                    </Box>
+                  </Flex>
+                </Flex>
+
+                <Flex align="center" justify="between">
+                  <Text size="2" weight="medium">
+                    Current Level
+                  </Text>
+                  <Box className="w-2/3">
+                    <Tooltip content="Your level will be adjusted by practicing!">
+                      <input
+                        type="text"
+                        className="h-9 w-full rounded border px-2"
+                        defaultValue={CEFR_LEVELS[user.language_level - 1]}
+                        disabled
+                      />
+                    </Tooltip>
+                  </Box>
+                </Flex>
+              </Box>
+
+              <Separator size="4" />
+
               <Box className="space-y-4">
                 <Heading size="3">Language Settings</Heading>
 
@@ -370,27 +378,6 @@ export default function UserProfilePage() {
                           No voice for this language
                         </Text>
                       )}
-                    </Box>
-                  </Flex>
-
-                  <Flex align="center" justify="between">
-                    <Text size="2" weight="medium">
-                      Proficiency Level
-                    </Text>
-                    <Box className="w-2/3">
-                      <select
-                        className="h-9 w-full rounded border px-2"
-                        id="language_level"
-                        name="language_level"
-                        defaultValue={user.language_level}
-                      >
-                        <option value="1">A1 - Beginner</option>
-                        <option value="2">A2 - Elementary</option>
-                        <option value="3">B1 - Intermediate</option>
-                        <option value="4">B2 - Upper Intermediate</option>
-                        <option value="5">C1 - Advanced</option>
-                        <option value="6">C2 - Proficient</option>
-                      </select>
                     </Box>
                   </Flex>
                 </Flex>

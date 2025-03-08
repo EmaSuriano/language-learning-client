@@ -26,32 +26,19 @@ import {
   Grid,
   Container,
   Separator,
-  Button,
-  IconButton,
 } from "@radix-ui/themes";
 import { useUserLearningHistory } from "@/hooks/useUserLearningHistory";
 import { useAuthUser } from "@/hooks/useLearningSession";
-import { useRouter } from "next/navigation";
-import { LoopIcon, ChatBubbleIcon } from "@radix-ui/react-icons";
-import {
-  Languages,
-  ArrowUp,
-  ArrowDown,
-  MoveUpRight,
-  MoveDownRight,
-  MoveRight,
-} from "lucide-react";
-import Link from "next/link";
+import { MoveUpRight, MoveDownRight, MoveRight, ChartArea } from "lucide-react";
 
 export const LearningHistory = () => {
   const { user } = useAuthUser();
-  const router = useRouter();
   const [viewMode, setViewMode] = useState("detailed");
   const {
     data: rawData = [],
-    refetch,
     isPending: loading,
     error,
+    refetch,
   } = useUserLearningHistory(user!.id);
 
   // Map and format data for charting
@@ -137,18 +124,11 @@ export const LearningHistory = () => {
             align={{ initial: "start", sm: "center" }}
             direction={{ initial: "column", sm: "row" }}
             gap="4"
-            mb="4"
           >
             <Flex direction="column" mb="4">
               <Flex gap="2" align="center">
-                <Heading size="6">Learning Progress Dashboard</Heading>
-                <IconButton
-                  radius="full"
-                  variant="soft"
-                  onClick={() => refetch()}
-                >
-                  <LoopIcon width="18" height="18" />
-                </IconButton>
+                <ChartArea size={20} />
+                <Heading size="6">Learning Progress</Heading>
               </Flex>
 
               <Text size="2" color="gray">
@@ -156,35 +136,33 @@ export const LearningHistory = () => {
               </Text>
             </Flex>
 
-            <Flex gap="4" align="center">
-              <Tabs.Root
-                defaultValue="detailed"
-                value={viewMode}
-                onValueChange={setViewMode}
-              >
-                <Tabs.List className="flex border-b">
-                  <Tabs.Trigger
-                    className="px-4 py-2 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500"
-                    value="detailed"
-                  >
-                    Detailed
-                  </Tabs.Trigger>
-                  <Tabs.Trigger
-                    className="px-4 py-2 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500"
-                    value="trend"
-                  >
-                    Trend
-                  </Tabs.Trigger>
-                </Tabs.List>
-              </Tabs.Root>
-            </Flex>
+            <Tabs.Root
+              defaultValue="detailed"
+              value={viewMode}
+              onValueChange={setViewMode}
+            >
+              <Tabs.List className="flex border-b">
+                <Tabs.Trigger
+                  className="px-4 py-2 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500"
+                  value="detailed"
+                >
+                  Detailed
+                </Tabs.Trigger>
+                <Tabs.Trigger
+                  className="px-4 py-2 focus:outline-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500"
+                  value="trend"
+                >
+                  Trend
+                </Tabs.Trigger>
+              </Tabs.List>
+            </Tabs.Root>
           </Flex>
 
           {/* Chart container */}
           <Box
             style={{ height: "400px", width: "100%" }}
             className="chart-container"
-            mb="4"
+            mb="6"
           >
             <Tabs.Root
               value={viewMode}
@@ -326,8 +304,8 @@ export const LearningHistory = () => {
                   Grammar
                 </Text>
                 <Text size="6" weight="bold">
-                  {Math.round(_.meanBy(chartData, "grammar"))}
-                  <Text size="2" weight="normal" color="violet">
+                  {Math.round(_.meanBy(chartData, "grammar") || 0)}
+                  <Text size="2" weight="regular" color="violet">
                     /100
                   </Text>
                 </Text>
@@ -340,8 +318,8 @@ export const LearningHistory = () => {
                   Vocabulary
                 </Text>
                 <Text size="6" weight="bold">
-                  {Math.round(_.meanBy(chartData, "vocabulary"))}
-                  <Text size="2" weight="normal" color="green">
+                  {Math.round(_.meanBy(chartData, "vocabulary") || 0)}
+                  <Text size="2" weight="regular" color="green">
                     /100
                   </Text>
                 </Text>
@@ -354,8 +332,8 @@ export const LearningHistory = () => {
                   Fluency
                 </Text>
                 <Text size="6" weight="bold">
-                  {Math.round(_.meanBy(chartData, "fluency"))}
-                  <Text size="2" weight="normal" color="amber">
+                  {Math.round(_.meanBy(chartData, "fluency")) || 0}
+                  <Text size="2" weight="regular" color="amber">
                     /100
                   </Text>
                 </Text>
@@ -368,51 +346,14 @@ export const LearningHistory = () => {
                   Goals
                 </Text>
                 <Text size="6" weight="bold">
-                  {Math.round(_.meanBy(chartData, "goals"))}
-                  <Text size="2" weight="normal" color="orange">
+                  {Math.round(_.meanBy(chartData, "goals")) || 0}
+                  <Text size="2" weight="regular" color="orange">
                     /100
                   </Text>
                 </Text>
               </Flex>
             </Card>
           </Grid>
-
-          <Separator size="4" my="4" />
-
-          {/* Features highlights - matching login page style */}
-          <Box pt="2">
-            <Heading size="3" mb="2">
-              Level Changes Summary
-            </Heading>
-            <Flex direction="column" gap="2">
-              {Object.entries(_.countBy(chartData, "level_change")).map(
-                ([change, count]) => (
-                  <Flex key={change} align="center" gap="2">
-                    <Box
-                      className={
-                        change === "INCREASE"
-                          ? "text-green-600"
-                          : change === "DECREASE"
-                          ? "text-red-600"
-                          : "text-indigo-600"
-                      }
-                    >
-                      {change === "INCREASE" ? (
-                        <MoveUpRight size={16} />
-                      ) : change === "DECREASE" ? (
-                        <MoveDownRight size={16} />
-                      ) : (
-                        <MoveRight size={16} />
-                      )}
-                    </Box>
-                    <Text size="2">
-                      {change}: <strong>{count}</strong> sessions
-                    </Text>
-                  </Flex>
-                )
-              )}
-            </Flex>
-          </Box>
         </Card>
       </Container>
     </Box>
@@ -432,14 +373,6 @@ const CustomTooltip = ({ active, payload, label, viewMode }) => {
               {entry.name}: {Math.round(entry.value * 100) / 100}
             </Text>
           ))}
-          {viewMode === "detailed" && payload[0].payload.level_change && (
-            <Flex gap="2" mt="2">
-              <Text size="1">Level change:</Text>
-              <Text size="1" weight="bold">
-                {payload[0].payload.level_change}
-              </Text>
-            </Flex>
-          )}
         </Flex>
       </Card>
     );

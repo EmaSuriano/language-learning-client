@@ -14,7 +14,7 @@ export const EvaluatorOverviewChart = ({
   data: EvaluatorOverviewResponse;
 }) => {
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md max-w-md mx-auto">
+    <div className="p-2 bg-white rounded-lg shadow-md max-w-md mx-auto">
       <SkillBar label="Grammar" value={data.grammar} color={COLORS.grammar} />
 
       <SkillBar

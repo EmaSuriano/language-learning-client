@@ -1,5 +1,5 @@
 "use client";
-import { MouseEvent, MouseEventHandler, useEffect } from "react";
+import { MouseEventHandler, useEffect } from "react";
 import {
   AssistantMessage,
   useMessageRuntime,
@@ -8,10 +8,10 @@ import {
 } from "@assistant-ui/react";
 
 import { useAppConfigStore } from "@/hooks/useAppConfigStore";
-import { Button, Tooltip } from "@radix-ui/themes";
-import { CheckIcon, LanguagesIcon, Loader2Icon } from "lucide-react";
+import { LanguagesIcon, Loader2Icon } from "lucide-react";
 import { useTranslator } from "@/hooks/useTranslator";
 import { useLearningSession } from "@/hooks/useLearningSession";
+import { mapToChatMessage } from "@/lib/ChatMessage";
 
 export const MyAssistantMessage = () => {
   return (
@@ -55,15 +55,10 @@ const TranslateMessage = () => {
   const handleTranslate: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
 
-    // extract to utils
-    const msg = message.content
-      .filter((c) => c.type === "text")
-      .map((c) => c.text)
-      .join(" ");
+    const chatMessage = mapToChatMessage(message);
 
-    // Only trigger if not already translating
     if (!isTranslating && !translationResult) {
-      translate({ user_id: user.id, message: msg });
+      translate({ user_id: user.id, message: chatMessage.content });
     }
   };
 
