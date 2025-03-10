@@ -30,10 +30,6 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const toggleCollapse = () => {
-    setCollapsed(!collapsed);
-  };
-
   const toggleMobileSidebar = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -43,7 +39,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       {/* Desktop Sidebar */}
       {!isMobile && (
         <Box className="relative">
-          <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} />
+          <Sidebar collapsed={collapsed} />
         </Box>
       )}
 

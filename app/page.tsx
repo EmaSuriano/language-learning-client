@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Theme,
   Button,
@@ -22,11 +22,16 @@ import {
   Book,
   Users,
   Check,
+  Moon,
+  Sun,
 } from "lucide-react";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import "react-lite-youtube-embed/dist/LiteYouTubeEmbed.css";
 import { redirect, RedirectType } from "next/navigation";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+import { Toggle } from "radix-ui";
+import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 
 const GH_USER = "https://github.com/emasuriano";
 const GH_PAPER = `${GH_USER}/language-learning-paper`;
@@ -45,8 +50,9 @@ const LandingPage = () => {
             <Heading size="6">AI Language Learning</Heading>
           </Flex>
           <Flex gap="4">
+            <ThemeToggle />
             <Link href="/login" passHref>
-              <Button variant="soft" size="2">
+              <Button variant="solid" size="2">
                 Login
               </Button>
             </Link>
@@ -336,5 +342,28 @@ const StepCard: React.FC<StepCardProps> = ({ number, title, description }) => (
     </Flex>
   </Card>
 );
+
+const ThemeToggle = () => {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const isDark = theme === "dark";
+
+  return (
+    <Toggle.Root
+      pressed={isDark}
+      onPressedChange={() => setTheme(isDark ? "light" : "dark")}
+      className={`p-2 rounded transition-colors bg-gray-200 text-gray-900 hover:bg-gray-300 data-[state=on]:bg-gray-800 data-[state=on]:text-white `}
+    >
+      {isDark ? <MoonIcon /> : <SunIcon />}
+    </Toggle.Root>
+  );
+};
 
 export default LandingPage;

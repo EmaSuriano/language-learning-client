@@ -1,20 +1,11 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  output: "export", // Feel free to modify/remove this option
-  reactStrictMode: true,
-  basePath: "/language-learning-client",
+const isLocal = process.env.NODE_ENV === "development";
 
-  // // Override the default webpack configuration
-  // webpack: (config) => {
-  //   // See https://webpack.js.org/configuration/resolve/#resolvealias
-  //   config.resolve.alias = {
-  //     ...config.resolve.alias,
-  //     sharp$: false,
-  //     "onnxruntime-node$": false,
-  //   };
-  //   return config;
-  // },
+const nextConfig: NextConfig = {
+  output: "export",
+  reactStrictMode: true,
+  basePath: isLocal ? "" : "/language-learning-client",
 };
 
 export default nextConfig;

@@ -15,13 +15,9 @@ import { useAuthUser } from "@/hooks/useLearningSession";
 
 interface SidebarProps {
   collapsed?: boolean;
-  toggleCollapse?: () => void;
 }
 
-export default function Sidebar({
-  collapsed = false,
-  toggleCollapse,
-}: SidebarProps) {
+export default function Sidebar({ collapsed = false }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuthUser();
@@ -49,7 +45,7 @@ export default function Sidebar({
     <Box
       className={`h-screen ${
         collapsed ? "w-20" : "w-64"
-      } bg-white border-r border-gray-200 shadow-sm flex flex-col transition-all duration-300`}
+      } bg-white border-r border-gray-200 shadow-sm flex flex-col transition-all duration-300 flex flex-1`}
     >
       {/* Logo */}
       <Flex
@@ -68,8 +64,8 @@ export default function Sidebar({
 
       <Separator size="4" my="2" />
 
-      {/* Navigation Links */}
-      <Flex direction="column" gap="2" p="2" className="flex-grow">
+      {/* Navigation Links - Make this section expand to push profile down */}
+      <Flex direction="column" gap="2" p="2">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -99,15 +95,14 @@ export default function Sidebar({
         })}
       </Flex>
 
-      <Separator size="4" my="2" />
+      {/* Separator and User Profile - These stay at the bottom */}
+      <Separator size="4" my="2" mt="auto" />
 
-      {/* User Profile Section */}
       <Flex
         p="4"
         gap="3"
         align="center"
         justify={collapsed ? "center" : "between"}
-        className="mt-auto"
       >
         <Flex gap="3" align="center">
           <Avatar
