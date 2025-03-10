@@ -29,11 +29,13 @@ import {
 } from "@radix-ui/themes";
 import { useUserLearningHistory } from "@/hooks/useUserLearningHistory";
 import { useAuthUser } from "@/hooks/useLearningSession";
-import { MoveUpRight, MoveDownRight, MoveRight, ChartArea } from "lucide-react";
+import { ChartArea } from "lucide-react";
+
+type ViewMode = "detailed" | "trend";
 
 export const LearningHistory = () => {
   const { user } = useAuthUser();
-  const [viewMode, setViewMode] = useState("detailed");
+  const [viewMode, setViewMode] = useState<ViewMode>("detailed");
   const {
     data: rawData = [],
     isPending: loading,
@@ -139,7 +141,7 @@ export const LearningHistory = () => {
             <Tabs.Root
               defaultValue="detailed"
               value={viewMode}
-              onValueChange={setViewMode}
+              onValueChange={(str) => setViewMode(str as ViewMode)}
             >
               <Tabs.List className="flex border-b">
                 <Tabs.Trigger
@@ -360,7 +362,17 @@ export const LearningHistory = () => {
   );
 };
 
-const CustomTooltip = ({ active, payload, label, viewMode }) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  viewMode,
+}: {
+  viewMode: ViewMode;
+  active?: boolean;
+  payload?: any[];
+  label?: string;
+}) => {
   if (active && payload && payload.length) {
     return (
       <Card size="1" style={{ maxWidth: "220px" }}>

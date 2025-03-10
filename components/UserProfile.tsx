@@ -65,41 +65,38 @@ export default function UserProfilePage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Handle form submission
-  const onUpdate = async (update: UserUpdate) => {
-    try {
-      await updateUser({ id: user.id.toString(), userData: update });
-      return true;
-    } catch (error) {
-      console.error("Failed to update user:", error);
-      return false;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const formData = new FormData(e.currentTarget);
+    try {
+      if (!user || !selectedLanguage) {
+        throw new Error("User or selected language not found");
+      }
 
-    setEnableAutoPlay(Boolean(formData.get("autoplay")));
-    setTheme(Boolean(formData.get("theme")) ? "dark" : "light");
+      const formData = new FormData(e.currentTarget);
 
-    const success = await onUpdate({
-      name: formData.get("name") as string,
-      language_code: selectedLanguage.code,
-      voice_id: selectedLanguage.has_tts
-        ? (formData.get("voice_id") as string)
-        : null,
-    });
+      setEnableAutoPlay(Boolean(formData.get("autoplay")));
+      setTheme(Boolean(formData.get("theme")) ? "dark" : "light");
 
-    if (success) {
+      await updateUser({
+        id: user.id.toString(),
+        userData: {
+          name: formData.get("name") as string,
+          language_code: selectedLanguage.code,
+          voice_id: selectedLanguage.has_tts
+            ? (formData.get("voice_id") as string)
+            : null,
+        },
+      });
+
       setShowSuccess(true);
       // Hide success message after 3 seconds
       setTimeout(() => {
         setShowSuccess(false);
       }, 3000);
-    } else {
+    } catch (error) {
+      console.error("Failed to update user:", error);
       setErrorMessage("Failed to update profile. Please try again.");
     }
   };
@@ -366,6 +363,7 @@ export default function UserProfilePage() {
                           id="voice_id"
                           name="voice_id"
                           defaultValue={user.voice_id || undefined}
+                          disabled={voicesLoading}
                         >
                           {voices.map((voice) => (
                             <option key={voice} value={voice}>

@@ -44,22 +44,6 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       {!isMobile && (
         <Box className="relative">
           <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} />
-
-          {/* Collapse Toggle Button */}
-          <Tooltip content={collapsed ? "Expand" : "Collapse"} side="right">
-            <Button
-              variant="ghost"
-              size="1"
-              className="absolute -right-3 top-20 rounded-full bg-white border border-gray-200 shadow-sm z-10"
-              onClick={toggleCollapse}
-            >
-              {collapsed ? (
-                <ChevronRight size={14} />
-              ) : (
-                <ChevronLeft size={14} />
-              )}
-            </Button>
-          </Tooltip>
         </Box>
       )}
 
