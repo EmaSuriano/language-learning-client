@@ -238,7 +238,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <Separator size="4" />
-      <Box py="6" className="bg-white">
+      <Box p="6" className="bg-white">
         <Container size="4">
           <Flex justify="between" wrap="wrap" gap="4">
             <Flex direction="column" gap="2">

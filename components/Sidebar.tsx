@@ -42,10 +42,10 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   ];
 
   return (
-    <Box
+    <Flex
       className={`h-screen ${
         collapsed ? "w-20" : "w-64"
-      } bg-white border-r border-gray-200 shadow-sm flex flex-col transition-all duration-300 flex flex-1`}
+      } bg-white border-r border-gray-200 shadow-sm flex-col transition-all duration-300 flex-1`}
     >
       {/* Logo */}
       <Flex
@@ -133,6 +133,6 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           </Button>
         )}
       </Flex>
-    </Box>
+    </Flex>
   );
 }
