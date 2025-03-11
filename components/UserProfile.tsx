@@ -21,22 +21,12 @@ import {
 import { Switch } from "radix-ui";
 import { Save, User, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatVoiceTitle } from "@/lib/helpers";
+import { formatLevelToText, formatVoiceTitle } from "@/lib/helpers";
 import { useAppConfigStore } from "@/hooks/useAppConfigStore";
 import { useAuthUser } from "@/hooks/useLearningSession";
-import { UserUpdate } from "@/hooks/useUser";
 import { useLanguages } from "@/hooks/useLanguages";
 import { useTTSVoices } from "@/hooks/useTTS";
 import { useUpdateUser } from "@/hooks/useUser";
-
-const CEFR_LEVELS = [
-  "A1 - Beginner",
-  "A2 - Elementary",
-  "B1 - Intermediate",
-  "B2 - Upper Intermediate",
-  "C1 - Advanced",
-  "C2 - Proficient",
-];
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -313,7 +303,7 @@ export default function UserProfilePage() {
                       <input
                         type="text"
                         className="h-9 w-full rounded border px-2"
-                        defaultValue={CEFR_LEVELS[user.language_level - 1]}
+                        defaultValue={formatLevelToText(user.language_level)}
                         disabled
                       />
                     </Tooltip>

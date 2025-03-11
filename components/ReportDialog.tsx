@@ -5,7 +5,6 @@ import { mapToChatMessage } from "@/lib/ChatMessage";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   Box,
-  Container,
   Text,
   Flex,
   Card,
@@ -96,8 +95,8 @@ export const ReportDialog = ({
     <Dialog.Root open modal>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] overflow-auto max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-          <Theme accentColor="indigo" grayColor="slate">
+        <Theme accentColor="indigo" grayColor="slate">
+          <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] overflow-auto max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
             <Card size="3">
               <Flex direction="column" gap="2">
                 <Box>
@@ -225,8 +224,8 @@ export const ReportDialog = ({
                 </Flex>
               </Flex>
             </Card>
-          </Theme>
-        </Dialog.Content>
+          </Dialog.Content>
+        </Theme>
       </Dialog.Portal>
     </Dialog.Root>
   );

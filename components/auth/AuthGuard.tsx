@@ -1,20 +1,20 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import { useUser } from "@/hooks/useUser";
-import { redirect, RedirectType, useRouter } from "next/navigation";
-import { PropsWithChildren, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { PropsWithChildren } from "react";
 
 export const AuthGuard = ({ children }: PropsWithChildren) => {
   const { session } = useAuth();
   const { data: user, isLoading } = useUser(session ? session.userId : null);
-  const router = useRouter(); // Add this line
+  const router = useRouter();
+  const isMounted = useIsMounted();
 
-  if (!session) {
-    console.log("Nextjs is redirecting on the server ...");
-    try {
-      router.replace("/login");
-    } catch (error) {}
+  // This avoid an hydration issue when using SSR
+  if (isMounted && !session) {
+    router.replace("/login");
   }
 
   if (isLoading || !user) {

@@ -32,6 +32,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Toggle } from "radix-ui";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const GH_USER = "https://github.com/emasuriano";
 const GH_PAPER = `${GH_USER}/language-learning-paper`;
@@ -345,13 +346,12 @@ const StepCard: React.FC<StepCardProps> = ({ number, title, description }) => (
 
 const ThemeToggle = () => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useIsMounted();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+  // This avoid an hydration issue when using SSR
+  if (!isMounted) {
+    return null;
+  }
 
   const isDark = theme === "dark";
 

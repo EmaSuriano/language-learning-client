@@ -14,3 +14,16 @@ export const formatVoiceTitle = (voice: string) => {
 
   return `${capitalize(name)} ${GENDER_TO_ICON[gender]}`;
 };
+
+const CEFR_LEVELS = [
+  "A1 - Beginner",
+  "A2 - Elementary",
+  "B1 - Intermediate",
+  "B2 - Upper Intermediate",
+  "C1 - Advanced",
+  "C2 - Proficient",
+];
+
+export const formatLevelToText = (level: number) => {
+  return CEFR_LEVELS[level - 1];
+};
