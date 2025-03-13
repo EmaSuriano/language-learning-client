@@ -104,7 +104,7 @@ const LandingPage = () => {
           className="shadow-md my-9"
           style={{ maxWidth: "800px", margin: "0 auto" }}
         >
-          <LiteYouTubeEmbed id="YviWsypJF9c" title="Demo Video" />
+          <LiteYouTubeEmbed id="gNjNC20ThR4" title="Demo Video" />
         </Card>
 
         {/* Features Section - No card, let features breathe */}
