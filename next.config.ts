@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 
-const isLocal = process.env.NODE_ENV === "development";
+const basePath =
+  process.env.NODE_ENV === "development" ? "" : "/language-learning-client";
 
 const nextConfig: NextConfig = {
   output: "export",
   reactStrictMode: true,
-  basePath: isLocal ? "" : "/language-learning-client",
+  basePath,
 };
 
 export default nextConfig;
