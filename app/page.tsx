@@ -35,10 +35,10 @@ import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useIsMounted } from "@/hooks/useIsMounted";
 
 const GH_USER = "https://github.com/emasuriano";
-const GH_PAPER = `${GH_USER}/language-learning-paper`;
 const GH_CLIENT = `${GH_USER}/language-learning-client`;
 const GH_SERVER = `${GH_USER}/language-learning-server`;
-const PAPER_LINK = `https://docs.google.com/viewer?url=${GH_PAPER}/blob/main/memoria.pdf?raw=true`;
+const PAPER_LINK_ES = `/paper?lang=es`;
+const PAPER_LINK_EN = `/paper?lang=en`;
 
 const LandingPage = () => {
   return (
@@ -154,12 +154,22 @@ const LandingPage = () => {
               our paper on adaptive language learning systems. The paper details
               the methodology, algorithms, and evaluation results.
             </Text>
-            <Link href={PAPER_LINK} passHref>
-              <Button variant="outline" size="2">
-                <Book size={16} className="mr-2" />
-                Read the Paper
-              </Button>
-            </Link>
+
+            <Flex gap="2">
+              <Link href={PAPER_LINK_ES} passHref>
+                <Button variant="outline" size="2">
+                  <Book size={16} className="mr-2" />
+                  Read the Paper - Spanish (Official publication)
+                </Button>
+              </Link>
+
+              <Link href={PAPER_LINK_EN} passHref>
+                <Button variant="outline" size="2">
+                  <Book size={16} className="mr-2" />
+                  Read the Paper - English
+                </Button>
+              </Link>
+            </Flex>
           </Flex>
         </Card>
 
@@ -262,7 +272,7 @@ const LandingPage = () => {
                     Documentation
                   </Text>
                 </Link>
-                <Link href={PAPER_LINK} passHref>
+                <Link href={PAPER_LINK_ES} passHref>
                   <Text size="2" color="gray">
                     Research Paper
                   </Text>

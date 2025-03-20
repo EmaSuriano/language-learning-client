@@ -40,6 +40,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Download papers
+        run: yarn download-pdfs
+
       - name: Build and export static files
         run: yarn build
         env:

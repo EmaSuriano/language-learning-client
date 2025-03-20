@@ -20,6 +20,9 @@
 # production
 /build
 
+# Dynamically generated content on CI
+/static/pdfs
+
 # misc
 .DS_Store
 *.pem
